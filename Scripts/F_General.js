@@ -1,16 +1,23 @@
 const { refObject, Button, ImageButton, Text, Vector } = require('@tabletop-playground/api');
-const { ChangeImageSlider, PositionsFontUI, TypeShow, CreateCanvasElement } = require('./general/General_Functions.js');
+const { ChangeImageSlider, PositionsFontUI, TypeShow, CreateCanvasElement, GetCurrentLevel } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 let figurePlate;
 refObject.onCreated.add(() => {
   loadState();
   setTimeout(() => {
     let allObject = world.getAllObjects();
+    let checkInfo = false;
     for (let i = 0; i < allObject.length; i++) {
-      if (refObject != allObject[i] && refObject.getName() == allObject[i].getName() && allObject[i].getTemplateName() == "Figure") {
-        figurePlate = allObject[i];
-        figurePlate.SetHelthPlate(helthPoint, actionPoint);
-        break;
+      if (refObject != allObject[i] && refObject.getName() == allObject[i].getName()) {
+        if (allObject[i].getTemplateName() == "Figure") {
+          figurePlate = allObject[i];
+          figurePlate.SetHelthPlate(helthPoint, actionPoint);
+        } else if (allObject[i].SetHealthActionPlate) {
+          allObject[i].SetHealthActionPlate(helthPoint, actionPoint);
+          checkInfo = true;
+        }
+        if (checkInfo && figurePlate)
+          break;
       }
     }
   }, 200);
@@ -28,8 +35,8 @@ class HelthPoints {
   constructor(parent, position) {
     let offsetX = -1.31;
     this.parent = parent;
-    this.helthValue = 50;
-    this.maxHelthValue = 100;
+    this.helthValue = 30;
+    this.maxHelthValue = 30;
     this.startPosition = position.add(new Vector(offsetX, 0, 0));
     //-------------------------
     let nC = new Canvas();
@@ -44,15 +51,14 @@ class HelthPoints {
     this.backText.setFontSize(40);
     nC.addChild(this.backText, 15, 180, 350, 80);
     //-------------------------
-    this.helth = new ImageWidget().setImage("barline1.png");
+    let helth = new ImageWidget().setImage("barline1.png");
 
-    let procent = (100 * this.helthValue) / this.maxHelthValue;
     this.helthUI.useWidgetSize = false;
-    this.helthUI.width = procent * 10;
+    this.helthUI.width = 0;
     this.helthUI.height = 65;
     this.helthUI.position = position.add(new Vector(offsetX, PositionsFontUI(this.startImageSliderPosX, this.helthUI.width), 0));
     this.helthUI.rotation = new Rotator(0, 0, 180);
-    this.helthUI.widget = this.helth;
+    this.helthUI.widget = helth;
     this.helthUI.scale = 0.1;
     parent.attachUI(this.helthUI);
     //-------------------------
@@ -64,7 +70,7 @@ class HelthPoints {
     this.increment.setImageSize(100);
     nC.addChild(this.increment, 1490, 90, 60, 60);
     //-------------------------
-    this.fontText = new Text().setText(procent + "%").setTextColor(new Color(0.75, 0.75, 0.75)).setFont(nameFont);
+    this.fontText = new Text().setText("%").setTextColor(new Color(0.75, 0.75, 0.75)).setFont(nameFont);
     this.fontText.setFontSize(18);
 
     let fountTextUI = new UIElement();
@@ -108,16 +114,33 @@ class HelthPoints {
   set value(number) {
     this.helthValue = number;
     ChangeImageSlider(
-      this.helthUI, this.helthValue, this.maxHelthValue, this.startPosition, this.fontText, this.parent, this.startImageSliderPosX, TypeShow.PROCENT);
+      this.helthUI, number, this.maxHelthValue, this.startPosition, this.fontText, this.parent, this.startImageSliderPosX, TypeShow.PROCENT);
     if (!this.firstTime) saveState(); else this.firstTime = false;
-    this.backText.setText(this.helthValue + "/" + this.maxHelthValue + " max");
-    setTimeout(() => {
-      figurePlate.SetValueH(this.helthValue + "/" + this.maxHelthValue);
-    }, 210);
+    this.backText.setText(number + "/" + this.maxHelthValue + " max");
+    figurePlate.SetValueH(number + "/" + this.maxHelthValue);
   }
 
   get changedValue() { return parseInt(this.changedButton.getText()); }
   set changedValue(number) { this.changedButton.setText(number.toString()); }
+
+  SetMaxValue(strenght, endurance) {
+    let newMax = 0;
+    for (let i = 1; i <= GetCurrentLevel(); i++) {
+      if (i == 1) {
+        newMax += 15 + strenght + endurance * 2;
+      } else {
+        newMax += (parseInt(endurance / 2) + 2) * GetCurrentLevel();
+      }
+    }
+    this.maxHelthValue = newMax;
+    if (this.value > newMax) {
+      this.value = newMax;
+    } else {
+      ChangeImageSlider(
+        this.helthUI, this.value, newMax, this.startPosition, this.fontText, this.parent, this.startImageSliderPosX, TypeShow.PROCENT);
+      this.backText.setText(this.value + "/" + newMax + " max");
+    }
+  }
 }
 let helthPoint = new HelthPoints(refObject, new Vector(0, 0, zPosition));
 
@@ -129,8 +152,8 @@ class ActionPoints {
   constructor(parent, position) {
     let offsetVec = new Vector(0.55, 3, 0);
     this.parent = parent;
-    this.quantityAction = 5;
-    this.maxAction = 10;
+    this.quantityAction = 7;
+    this.maxAction = 7;
     this.totalAction = 15;
     this.startPosition = position.add(offsetVec);
     //-------------------------
@@ -220,9 +243,18 @@ class ActionPoints {
     this.ChangeImageAction();
     if (!this.firstTime) saveState(); else this.firstTime = false;
     this.backText.setText(this.quantityAction + "/" + this.maxAction + " max");
-    setTimeout(() => {
-      figurePlate.SetValueA(this.quantityAction + "/" + this.maxAction);
-    }, 210);
+    figurePlate.SetValueA(this.quantityAction + "/" + this.maxAction);
+  }
+
+  SetMaxValue(dextery) {
+    this.maxAction = parseInt(5 + dextery / 2);
+    if (this.maxAction < this.totalAction) {
+      if (this.value > this.maxAction) {
+        this.value = this.maxAction;
+      } else {
+        this.backText.setText(this.value + "/" + this.maxAction + " max");
+      }
+    }
   }
 
   get changedValue() { return parseInt(this.changedButton.getText()); }
@@ -247,12 +279,16 @@ function loadState() {
 
   let state = JSON.parse(refObject.getSavedData());
 
-  helthPoint.value = state["helthPoint"];
-  actionPoint.value = state["actionPoint"];
+  setTimeout(() => {
+    helthPoint.value = state["helthPoint"];
+    actionPoint.value = state["actionPoint"];
+  }, 210);
 }
 
 refObject.ResetValue = function () {
-  helthPoint.value = 50;
-  actionPoint.value = 5;
+  helthPoint.value = 30;
+  actionPoint.value = 7;
+  helthPoint.SetMaxValue(30);
+  actionPoint.SetMaxValue(7);
   saveState();
 }

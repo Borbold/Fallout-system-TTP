@@ -20,6 +20,9 @@ for (let i = 0; i < countStatus; i++) {
   allStatus[i].setInputType(4);
   allStatus[i].onTextCommitted.add((_1, _2, text) => {
     statusValue[i] = text;
+    let value = parseInt(text);
+    let brightness = (value >= 1000 && 0.01) || (value >= 750 && 0.2) || (value >= 500 && 0.25) || (value >= 250 && 0.5) || 1;
+    allStatus[i].setTextColor(new Color(1, brightness, brightness));
     saveState();
   })
 }

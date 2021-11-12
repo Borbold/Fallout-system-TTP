@@ -22,7 +22,7 @@ class MainIfo {
     let offsetX = 140, offsetY = 50;
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
+    this.nCUI = CreateCanvasElement(nC, position.add(new Vector(-0.44, 0, 0)), widgetWidth, widgetHeight);
     this.nCUI.rotation = new Rotator(-65, 0, 180);
     parent.attachUI(this.nCUI);
     //-------------------------
@@ -48,7 +48,6 @@ class MainIfo {
       } else {
         helthPlate.value = helthPlate.helthValue - helthPlate.changedValue;
       }
-      t.fontTextH.setText(helthPlate.helthValue + "/" + helthPlate.changedValue);
     });
     this.incrementH.onClicked.add(function () {
       if (helthPlate.helthValue + helthPlate.changedValue > helthPlate.maxHelthValue) {
@@ -56,7 +55,6 @@ class MainIfo {
       } else {
         helthPlate.value = helthPlate.helthValue + helthPlate.changedValue;
       }
-      t.fontTextH.setText(helthPlate.helthValue + "/" + helthPlate.changedValue);
     });
     //-------------------------
     this.decrementA = new ImageButton().setImage("minus.png");
@@ -77,7 +75,6 @@ class MainIfo {
       } else {
         actionPlate.value = actionPlate.quantityAction - actionPlate.changedValue;
       }
-      t.fontTextA.setText(actionPlate.quantityAction + "/" + actionPlate.maxAction);
     });
     this.incrementA.onClicked.add(function () {
       if (actionPlate.quantityAction + actionPlate.changedValue > actionPlate.maxAction) {
@@ -85,7 +82,6 @@ class MainIfo {
       } else {
         actionPlate.value = actionPlate.quantityAction + actionPlate.changedValue;
       }
-      t.fontTextA.setText(actionPlate.quantityAction + "/" + actionPlate.maxAction);
     });
   }
 

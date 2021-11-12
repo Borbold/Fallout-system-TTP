@@ -26,8 +26,6 @@ refObject.ChangeValues = (description, itemGrab) => {
   for (let j = 0; j < arrayStatus.length; j++) {
     for (let i = 0; i < brokenDescription.length; i++) {
       if (brokenDescription[i].toLowerCase().includes(arrayStatus[j])) {
-        console.clear();
-        console.log(brokenDescription[i].slice(arrayStatus[j].length + 1));
         let value = parseInt(brokenDescription[i].slice(arrayStatus[j].length + 1)) * (!itemGrab && 1);
         AddValueMain(refObject.getName(), j, value, "status");
       }

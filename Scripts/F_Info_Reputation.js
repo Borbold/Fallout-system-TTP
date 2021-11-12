@@ -3,7 +3,9 @@ const { SetValueChars, TypeCharacteristic, SetFreePoints, SetIdObject, CreateCan
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   SetIdObject(refObject.getName(), refObject.getId());
-  loadState();
+  setTimeout(() => {
+    loadState();
+  }, 500);
 })
 //-----------------------------------------------------------------
 const zPosition = 0.1;
@@ -51,10 +53,12 @@ for (let i = 0; i < countChar; i++) {
     let value = parseInt(majorCharacteristics[i].getText());
     if (i == TypeCharacteristic.intelligence) {
       characteristics.GrowthRate = value;
+    } else if (i == TypeCharacteristic.strenght || i == TypeCharacteristic.endurance) {
+      healthPlate.SetMaxValue(valueMajorC[TypeCharacteristic.strenght], valueMajorC[TypeCharacteristic.endurance]);
+    } else if (i == TypeCharacteristic.dextery) {
+      actionPlate.SetMaxValue(valueMajorC[TypeCharacteristic.strenght]);
     }
-    setTimeout(() => {
-      SetValueChars(refObject.getName(), valueMajorC);
-    }, 100);
+    SetValueChars(refObject.getName(), valueMajorC);
     saveState();
   })
   //--
@@ -80,7 +84,11 @@ for (let i = 0; i < countChar; i++) {
   mainCharacteristics[i].onTextCommitted.add((_1, _2, text) => {
     valueMainC[i] = text;
     RecalculationMajorCharacteristic(i);
-    characteristics.RecalculationFreePoints();
+    let currentPoints = 0;
+    for (let i = 0; i < countChar; i++) {
+      currentPoints += parseInt(valueMainC[i]);
+    }
+    characteristics.RecalculationFreePoints(currentPoints);
   })
   //--
   additionValueMain[i] = 0;
@@ -136,7 +144,8 @@ class Info {
     //-------------------------
     this.karmaText = new TextBox().setInputType(3).setText("0").setFont(nameFont);
     this.karmaText.setFontSize(44);
-    this.karmaText.onTextCommitted.add(() => {
+    this.karmaText.onTextCommitted.add((_1, _2, text) => {
+      this.Karma = parseInt(text);
       saveState();
     })
     nC.addChild(this.karmaText, 725, 850, 160, 75);
@@ -154,7 +163,14 @@ class Info {
   }
 
   get Karma() { return this.karmaText.getText(); }
-  set Karma(value) { this.karmaText.setText(value); }
+  set Karma(value) {
+    let brightness = (value >= 1000 && 0.01) || (value >= 750 && 0.2) || (value >= 500 && 0.25) || (value >= 250 && 0.5) || 1;
+    if (value > 0) {
+      this.karmaText.setText(value).setTextColor(new Color(brightness, 1, brightness));
+    } else {
+      this.karmaText.setText(value).setTextColor(new Color(1, brightness, brightness));
+    }
+  }
 
   HideUI() {
     this.nCUI.position = this.hidePosition;
@@ -210,11 +226,7 @@ class Characteristics {
     nC.addChild(this.maxPoints, 1400, 735, 105, 85);
   }
 
-  RecalculationFreePoints() {
-    let currentPoints = 0;
-    for (let i = 0; i < countChar; i++) {
-      currentPoints += parseInt(mainCharacteristics[i].getText());
-    }
+  RecalculationFreePoints(currentPoints) {
     this.freePoints.setText(this.maxPointsVal - currentPoints);
   }
 
@@ -349,4 +361,10 @@ refObject.ResetValue = function () {
 refObject.AdditionMain = (index, value) => {
   additionValueMain[index] = value;
   RecalculationMajorCharacteristic(index);
+}
+
+let healthPlate, actionPlate;
+refObject.SetHealthActionPlate = (plate1, plate2) => {
+  healthPlate = plate1;
+  actionPlate = plate2;
 }

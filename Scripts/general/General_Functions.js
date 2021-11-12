@@ -38,6 +38,10 @@ function SetCurrentLevel(name, value) {
   SetFreePoints(name, currentFreePoints);
 }
 module.exports.SetCurrentLevel = SetCurrentLevel;
+function GetCurrentLevel() {
+  return currentLevel;
+}
+module.exports.GetCurrentLevel = GetCurrentLevel;
 //-----------------------------------------------------------------
 function AddValueMain(name, nameValue, value, type) {
   for (let i = 0; i < ids.length; i++) {
@@ -73,7 +77,7 @@ module.exports.TypeShow = TypeShow;
 
 function ChangeImageSlider(image, value, maxValue, position, text, parent, startX, type, multiply) {
   type = type || TypeShow.STANDART; multiply = multiply || 10;
-  let procent = (100 * value) / maxValue;
+  let procent = parseInt((100 * value) / maxValue);
   image.width = procent * multiply;
   image.position = position.add(new Vector(0, PositionsFontUI(startX, image.width), 0));
   if (TypeShow.STANDART == type)
