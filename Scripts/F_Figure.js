@@ -1,4 +1,5 @@
-const { refObject, ImageWidget, ImageButton, Text, TextBox, Vector } = require('@tabletop-playground/api');
+const { refObject, ImageWidget, ImageButton, Text, Vector } = require('@tabletop-playground/api');
+const { CreateCanvasElement } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   loadState();
@@ -21,15 +22,8 @@ class MainIfo {
     let offsetX = 140, offsetY = 50;
     //-------------------------
     let nC = new Canvas();
-
-    this.nCUI = new UIElement();
-    this.nCUI.useWidgetSize = false;
-    this.nCUI.position = position.add(new Vector(-0.4, 0, 0));
+    this.nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
     this.nCUI.rotation = new Rotator(-65, 0, 180);
-    this.nCUI.widget = nC;
-    this.nCUI.width = widgetWidth;
-    this.nCUI.height = widgetHeight;
-    this.nCUI.scale = 0.1;
     parent.attachUI(this.nCUI);
     //-------------------------
     let borderMain = new ImageWidget().setImage("brosok.png");
@@ -49,20 +43,20 @@ class MainIfo {
     nC.addChild(this.fontTextH, centerX - 50, centerY - offsetY, 200, 60);
     //-------------------------
     this.decrementH.onClicked.add(function () {
-      if ((helthPlate.helthValue - helthPlate.changeHelthValue) < 0) {
+      if ((helthPlate.helthValue - helthPlate.changedValue) < 0) {
         helthPlate.value = 0;
       } else {
-        helthPlate.value = helthPlate.helthValue - helthPlate.changeHelthValue;
+        helthPlate.value = helthPlate.helthValue - helthPlate.changedValue;
       }
-      t.fontTextH.setText(helthPlate.helthValue + "/" + helthPlate.changeHelthValue);
+      t.fontTextH.setText(helthPlate.helthValue + "/" + helthPlate.changedValue);
     });
     this.incrementH.onClicked.add(function () {
-      if (helthPlate.helthValue + helthPlate.changeHelthValue > helthPlate.maxHelthValue) {
+      if (helthPlate.helthValue + helthPlate.changedValue > helthPlate.maxHelthValue) {
         helthPlate.value = helthPlate.maxHelthValue;
       } else {
-        helthPlate.value = helthPlate.helthValue + helthPlate.changeHelthValue;
+        helthPlate.value = helthPlate.helthValue + helthPlate.changedValue;
       }
-      t.fontTextH.setText(helthPlate.helthValue + "/" + helthPlate.changeHelthValue);
+      t.fontTextH.setText(helthPlate.helthValue + "/" + helthPlate.changedValue);
     });
     //-------------------------
     this.decrementA = new ImageButton().setImage("minus.png");
@@ -78,18 +72,18 @@ class MainIfo {
     nC.addChild(this.fontTextA, centerX - 25, centerY + offsetY, 100, 60);
     //-------------------------
     this.decrementA.onClicked.add(function () {
-      if ((actionPlate.quantityAction - actionPlate.changeActionValue) < 0) {
+      if ((actionPlate.quantityAction - actionPlate.changedValue) < 0) {
         actionPlate.value = 0;
       } else {
-        actionPlate.value = actionPlate.quantityAction - actionPlate.changeActionValue;
+        actionPlate.value = actionPlate.quantityAction - actionPlate.changedValue;
       }
       t.fontTextA.setText(actionPlate.quantityAction + "/" + actionPlate.maxAction);
     });
     this.incrementA.onClicked.add(function () {
-      if (actionPlate.quantityAction + actionPlate.changeActionValue > actionPlate.maxAction) {
+      if (actionPlate.quantityAction + actionPlate.changedValue > actionPlate.maxAction) {
         actionPlate.value = actionPlate.maxAction;
       } else {
-        actionPlate.value = actionPlate.quantityAction + actionPlate.changeActionValue;
+        actionPlate.value = actionPlate.quantityAction + actionPlate.changedValue;
       }
       t.fontTextA.setText(actionPlate.quantityAction + "/" + actionPlate.maxAction);
     });

@@ -2,10 +2,13 @@ const { Vector } = require('@tabletop-playground/api');
 //-----------------------------------------------------------------
 let idObjects = [];
 let ids = [];
+//-----------------------------------------------------------------
 function SetIdObject(name, id) {
   idObjects[name + id] = id;
   ids.push(id);
 }
+module.exports.SetIdObject = SetIdObject;
+
 function SetValueChars(name, array) {
   for (let i = 0; i < ids.length; i++) {
     if (idObjects[name + ids[i]]) {
@@ -15,6 +18,7 @@ function SetValueChars(name, array) {
     }
   }
 }
+module.exports.SetValueChars = SetValueChars;
 //-----------------------------------------------------------------
 let currentLevel = 1, currentFreePoints = 0;
 function SetFreePoints(name, value) {
@@ -27,10 +31,13 @@ function SetFreePoints(name, value) {
     }
   }
 }
+module.exports.SetFreePoints = SetFreePoints;
+
 function SetCurrentLevel(name, value) {
   currentLevel = value;
   SetFreePoints(name, currentFreePoints);
 }
+module.exports.SetCurrentLevel = SetCurrentLevel;
 //-----------------------------------------------------------------
 function AddValueMain(name, nameValue, value, type) {
   for (let i = 0; i < ids.length; i++) {
@@ -42,6 +49,7 @@ function AddValueMain(name, nameValue, value, type) {
     }
   }
 }
+module.exports.AddValueMain = AddValueMain;
 //-----------------------------------------------------------------
 const TypeCharacteristic = {
   strenght: 0,
@@ -52,13 +60,17 @@ const TypeCharacteristic = {
   dextery: 5,
   luck: 6
 }
+module.exports.TypeCharacteristic = TypeCharacteristic
 //-----------------------------------------------------------------
 function PositionsFontUI(startX, i) { return startX - 0.005 * i; }
+module.exports.PositionsFontUI = PositionsFontUI;
 
 const TypeShow = {
   STANDART: 0,
   PROCENT: 1,
 }
+module.exports.TypeShow = TypeShow;
+
 function ChangeImageSlider(image, value, maxValue, position, text, parent, startX, type, multiply) {
   type = type || TypeShow.STANDART; multiply = multiply || 10;
   let procent = (100 * value) / maxValue;
@@ -70,13 +82,17 @@ function ChangeImageSlider(image, value, maxValue, position, text, parent, start
     text.setText(procent + "%");
   parent.updateUI(image);
 }
-//-----------------------------------------------------------------
 module.exports.ChangeImageSlider = ChangeImageSlider;
-module.exports.PositionsFontUI = PositionsFontUI;
-module.exports.TypeShow = TypeShow;
-module.exports.SetValueChars = SetValueChars;
-module.exports.SetIdObject = SetIdObject;
-module.exports.TypeCharacteristic = TypeCharacteristic
-module.exports.AddValueMain = AddValueMain;
-module.exports.SetFreePoints = SetFreePoints;
-module.exports.SetCurrentLevel = SetCurrentLevel;
+//-----------------------------------------------------------------
+function CreateCanvasElement(nC, position, widgetWidth, widgetHeight) {
+  let nCUI = new UIElement();
+  nCUI.useWidgetSize = false;
+  nCUI.position = position;
+  nCUI.rotation = new Rotator(0, 0, 180);
+  nCUI.widget = nC;
+  nCUI.width = widgetWidth;
+  nCUI.height = widgetHeight;
+  nCUI.scale = 0.1;
+  return nCUI;
+}
+module.exports.CreateCanvasElement = CreateCanvasElement;

@@ -1,5 +1,5 @@
 const { refObject, ImageButton, Text, TextBox, Vector } = require('@tabletop-playground/api');
-const { SetIdObject, TypeCharacteristic } = require('./general/General_Functions.js');
+const { SetIdObject, TypeCharacteristic, CreateCanvasElement } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   SetIdObject(refObject.getName(), refObject.getId());
@@ -100,6 +100,7 @@ function CreateSelectedButton(parent, position, index) {
       selectedSkills[index] = true;
       parent.removeChild(selected);
       parent.addChild(star, position.x, position.y, 50, 50);
+      RecalculationMajorSkills(index);
     }
   })
   parent.addChild(selectedSkills[index] && star || selected, position.x, position.y, 50, 50);
@@ -112,38 +113,30 @@ class SkillsMajor {
     this.hidePosition = position.add(new Vector(0, 0, -zPosition));
     this.freeSPValue = 0;
     //-------------------------
-    this.nC = new Canvas();
-
-    this.nCUI = new UIElement();
-    this.nCUI.useWidgetSize = false;
-    this.nCUI.position = position;
-    this.nCUI.rotation = new Rotator(0, 0, 180);
-    this.nCUI.widget = this.nC;
-    this.nCUI.width = widgetWidth;
-    this.nCUI.height = widgetHeight;
-    this.nCUI.scale = 0.1;
+    let nC = new Canvas();
+    this.nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
     let offsetY = 0; let offsetX = 440; let offsetButtonX = 30;
     for (let i = 0; i < countSkills; i++, offsetY++) {
-      CreateSelectedButton(this.nC, position.add(new Vector(offsetButtonX, 160 + offsetY * 70, 0)), i);
-      this.nC.addChild(majorSkills[i], offsetX, 150 + offsetY * 70, 100, 70);
-      CreateChangerTextBox(this.nC, i, position.add(new Vector(offsetX + 180, 150 + offsetY * 70, 0)), mainSkills, true);
+      CreateSelectedButton(nC, position.add(new Vector(offsetButtonX, 160 + offsetY * 70, 0)), i);
+      nC.addChild(majorSkills[i], offsetX, 150 + offsetY * 70, 100, 70);
+      CreateChangerTextBox(nC, i, position.add(new Vector(offsetX + 180, 150 + offsetY * 70, 0)), mainSkills, true);
       if (i == 9) { offsetY = -1; offsetX = 1170; offsetButtonX = 825; }
     }
     //-------------------------
     this.freeSkillPoint = new Text().setText("0").setFont(nameFont);
     this.freeSkillPoint.setFontSize(44);
-    this.nC.addChild(this.freeSkillPoint, 775, 870, 170, 90);
+    nC.addChild(this.freeSkillPoint, 775, 870, 170, 90);
     //-------------------------
     let borderMain = new Border();
     borderMain.setColor(new Color(0.05, 1, 0.05));
-    this.nC.addChild(borderMain, 650, 100, 40, 40);
-    this.nC.addChild(borderMain, 1380, 100, 40, 40);
+    nC.addChild(borderMain, 650, 100, 40, 40);
+    nC.addChild(borderMain, 1380, 100, 40, 40);
     //-------------------------
     let arrow = new ImageButton().setImage("right arrow.png");
     arrow.setImageSize(50);
-    this.nC.addChild(arrow, 1525, 25, 50, 50);
+    nC.addChild(arrow, 1525, 25, 50, 50);
     //-------------------------
     let t = this;
     arrow.onClicked.add(function () {
@@ -191,7 +184,6 @@ class SkillsMajor {
     this.parent.updateUI(this.nCUI);
   }
 }
-//let skillsMajor = new SkillsMajor(refObject, new Vector(0, 0, zPosition));
 
 class SkillsChanger {
   constructor(parent, position) {
@@ -200,15 +192,7 @@ class SkillsChanger {
     this.hidePosition = position;
     //-------------------------
     let nC = new Canvas();
-
-    this.nCUI = new UIElement();
-    this.nCUI.useWidgetSize = false;
-    this.nCUI.position = position;
-    this.nCUI.rotation = new Rotator(0, 0, 180);
-    this.nCUI.widget = nC;
-    this.nCUI.width = widgetWidth;
-    this.nCUI.height = widgetHeight;
-    this.nCUI.scale = 0.1;
+    this.nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
     let offsetY = 0; let offsetX = 500;

@@ -1,5 +1,5 @@
 const { refObject, ImageButton, ImageWidget, Text, TextBox, Vector } = require('@tabletop-playground/api');
-const { SetValueChars, TypeCharacteristic, SetFreePoints, SetIdObject } = require('./general/General_Functions.js');
+const { SetValueChars, TypeCharacteristic, SetFreePoints, SetIdObject, CreateCanvasElement } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   SetIdObject(refObject.getName(), refObject.getId());
@@ -127,15 +127,7 @@ class Info {
     this.hidePosition = position.add(new Vector(0, 0, -zPosition));
     //-------------------------
     let nC = new Canvas();
-
-    this.nCUI = new UIElement();
-    this.nCUI.useWidgetSize = false;
-    this.nCUI.position = position;
-    this.nCUI.rotation = new Rotator(0, 0, 180);
-    this.nCUI.widget = nC;
-    this.nCUI.width = widgetWidth;
-    this.nCUI.height = widgetHeight;
-    this.nCUI.scale = 0.1;
+    this.nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
     for (let i = 0; i < countInfo; i++) {
@@ -183,15 +175,7 @@ class Characteristics {
     this.hidePosition = position.add(new Vector(0, 0, -zPosition));
     //-------------------------
     let nC = new Canvas();
-
-    this.nCUI = new UIElement();
-    this.nCUI.useWidgetSize = false;
-    this.nCUI.position = position;
-    this.nCUI.rotation = new Rotator(0, 0, 180);
-    this.nCUI.widget = nC;
-    this.nCUI.width = widgetWidth;
-    this.nCUI.height = widgetHeight;
-    this.nCUI.scale = 0.1;
+    this.nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
     let borderBaff = new Border();
@@ -262,15 +246,7 @@ class Reputation {
     this.hidePosition = position;
     //-------------------------
     let nC = new Canvas();
-
-    this.nCUI = new UIElement();
-    this.nCUI.useWidgetSize = false;
-    this.nCUI.position = position;
-    this.nCUI.rotation = new Rotator(0, 0, 180);
-    this.nCUI.widget = nC;
-    this.nCUI.width = widgetWidth;
-    this.nCUI.height = widgetHeight;
-    this.nCUI.scale = 0.1;
+    this.nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
     let image = new ImageWidget().setImage("reput3.png");

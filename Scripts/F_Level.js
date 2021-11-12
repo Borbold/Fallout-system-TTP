@@ -1,5 +1,5 @@
 ﻿const { refObject, Button, ImageButton, Text, Vector, world } = require('@tabletop-playground/api');
-const { ChangeImageSlider, PositionsFontUI, SetCurrentLevel } = require('./general/General_Functions.js');
+const { ChangeImageSlider, PositionsFontUI, SetCurrentLevel, CreateCanvasElement } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   loadState();
@@ -11,31 +11,20 @@ const widgetHeight = 400;
 const nameFont = "Fallout.ttf";
 //-----------------------------------------------------------------
 class ExperienceBox {
-  startImageSliderPosX = 9.9;
-  firstTime = true;
-  fontUI = new UIElement();
-  //-------------------------
   constructor(parent, position) {
     this.parent = parent;
     this.Ex = 0;
     this.maxEx = 50;
+    this.firstTime = true;
+    this.startImageSliderPosX = 9.9;
     //-------------------------
     let nC = new Canvas();
-
-    this.nCUI = new UIElement();
-    this.nCUI.useWidgetSize = false;
-    this.nCUI.position = position;
-    this.nCUI.rotation = new Rotator(0, 0, 180);
-    this.nCUI.widget = nC;
-    this.nCUI.width = widgetWidth;
-    this.nCUI.height = widgetHeight;
-    this.nCUI.scale = 0.1;
+    this.nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
-    this.box = new Button().setFont(nameFont);
-    this.changeExValue = 1;
-    this.box.setFontSize(40);
-    nC.addChild(this.box, 440, 145, 100, 80);
+    this.changedButton = new Button().setText("1").setFont(nameFont);
+    this.changedButton.setFontSize(40);
+    nC.addChild(this.changedButton, 440, 145, 100, 80);
     //-------------------------
     position = position.add(new Vector(1.59, -3, 0));
     this.startPosition = position.add(new Vector(-0.08, 0, 0.01));
@@ -54,6 +43,7 @@ class ExperienceBox {
     this.font = new ImageWidget().setImage("barline1.png");
 
     let procent = (100 * this.Ex) / this.maxEx;
+    this.fontUI = new UIElement();
     this.fontUI.useWidgetSize = false;
     this.fontUI.width = procent * 14;
     this.fontUI.height = 80;
@@ -77,15 +67,15 @@ class ExperienceBox {
     let t = this;
     let boxTable = [1, 5, 10, 25, 50, 100];
     let boxIndex = 0;
-    this.box.onClicked.add(function () {
+    this.changedButton.onClicked.add(function () {
       boxIndex++;
       if (boxIndex >= boxTable.length) {
         boxIndex = 0;
       }
-      t.changeExValue = boxTable[boxIndex];
+      t.changedValue = boxTable[boxIndex];
     });
     this.decrement.onClicked.add(function () {
-      t.Ex -= t.changeExValue;
+      t.Ex -= t.changedValue;
       if (t.Ex < 0) {
         t.Ex = 0;
       }
@@ -94,15 +84,15 @@ class ExperienceBox {
       if (!t.firstTime) saveState(); else t.firstTime = false;
     });
     this.increment.onClicked.add(function () {
-      t.value += t.changeExValue;
+      t.value += t.changedValue;
       ChangeImageSlider(
         t.fontUI, t.Ex, t.maxEx, t.startPosition, t.fontText, t.parent, t.startImageSliderPosX, null, 14);
       if (!t.firstTime) saveState(); else t.firstTime = false;
     });
   }
 
-  get changeExValue() { return parseInt(this.box.getText()); }
-  set changeExValue(number) { this.box.setText(number.toString()); }
+  get changedValue() { return parseInt(this.changedButton.getText()); }
+  set changedValue(number) { this.changedButton.setText(number.toString()); }
 
   get value() { return this.Ex; }
   set value(number) {
@@ -129,22 +119,12 @@ class LevelBox {
     this.parent = parent;
     //-------------------------
     let nC = new Canvas();
-
-    this.nCUI = new UIElement();
-    this.nCUI.useWidgetSize = false;
-    this.nCUI.position = position;
-    this.nCUI.rotation = new Rotator(0, 0, 180);
-    this.nCUI.widget = nC;
-    this.nCUI.width = widgetWidth;
-    this.nCUI.height = widgetHeight;
-    this.nCUI.scale = 0.1;
-    parent.attachUI(this.nCUI);
+    let nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
+    parent.attachUI(nCUI);
     //-------------------------
-    this.box = new Text().setText("1").setFont(nameFont);
-    this.box.setEnabled(false);
-    this.box.setFontSize(50);
-    this.value = 1;
-    nC.addChild(this.box, 460, 50, 100, 80);
+    this.textLevel = new Text().setText("1").setFont(nameFont).setEnabled(false);
+    this.textLevel.setFontSize(50);
+    nC.addChild(this.textLevel, 460, 50, 100, 80);
     //-------------------------
     this.decrement = new ImageButton().setImage("minus.png");
     this.decrement.setImageSize(100);
@@ -167,10 +147,10 @@ class LevelBox {
     });
   }
 
-  get value() { return parseInt(this.box.getText()); }
+  get value() { return parseInt(this.textLevel.getText()); }
   set value(number) {
-    experience.SetMaxEx(50 * number, parseInt(this.box.getText()) > number);
-    this.box.setText(number.toString());
+    experience.SetMaxEx(50 * number, parseInt(this.textLevel.getText()) > number);
+    this.textLevel.setText(number.toString());
     SetCurrentLevel(refObject.getName(), number);
   }
 }
@@ -181,27 +161,18 @@ class ResetLevel {
     this.parent = parent;
     //-------------------------
     let nC = new Canvas();
-
-    this.nCUI = new UIElement();
-    this.nCUI.useWidgetSize = false;
-    this.nCUI.position = position;
-    this.nCUI.rotation = new Rotator(0, 0, 180);
-    this.nCUI.widget = nC;
-    this.nCUI.width = widgetWidth;
-    this.nCUI.height = widgetHeight;
-    this.nCUI.scale = 0.1;
-    parent.attachUI(this.nCUI);
+    let nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
+    parent.attachUI(nCUI);
     //-------------------------
-    this.reset = new ImageButton().setImage("resetl1.png");
-    this.reset.setImageSize(200);
-    nC.addChild(this.reset, 1385, 15, 200, 100);
+    this.resetButton = new ImageButton().setImage("resetl1.png");
+    this.resetButton.setImageSize(200);
+    nC.addChild(this.resetButton, 1385, 15, 200, 100);
     //-------------------------
-    this.reset.onClicked.add((obj, player) => {
+    this.resetButton.onClicked.add((obj, player) => {
       level.value = 1;
       experience.value = 0;
       let allObject = world.getAllObjects();
       for (let i = 0; i < allObject.length; i++) {
-        //world.broadcastChatMessage(allObject[i].getName() + ":" + i);
         if (refObject != allObject[i] && refObject.getName() == allObject[i].getName()) {
           allObject[i].ResetValue();
         }
