@@ -52,7 +52,7 @@ for (let i = 0; i < countChar; i++) {
   majorCharacteristics[i].onTextCommitted.add(() => {
     let value = parseInt(majorCharacteristics[i].getText());
     if (i == TypeCharacteristic.intelligence) {
-      characteristics.GrowthRate = value;
+      info.GrowthRate = value;
     } else if (i == TypeCharacteristic.strenght || i == TypeCharacteristic.endurance) {
       healthPlate.SetMaxValue(valueMajorC[TypeCharacteristic.strenght], valueMajorC[TypeCharacteristic.endurance], GetCurrentLevel());
     } else if (i == TypeCharacteristic.dextery) {
@@ -130,12 +130,13 @@ function CreateCharacteristicTextBox(parent, index, position, typeChar) {
 //-----------------------------------------------------------------
 class Info {
   constructor(parent, position) {
+    let t = this;
     this.parent = parent;
     this.showPosition = position;
     this.hidePosition = position.add(new Vector(0, 0, -zPosition));
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
+    this.nCUI = CreateCanvasElement(nC, position.add(new Vector(0, 3.5, 0)), widgetWidth / 2 + 100, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
     for (let i = 0; i < countInfo; i++) {
@@ -148,23 +149,35 @@ class Info {
       this.Karma = parseInt(text);
       saveState();
     })
-    nC.addChild(this.karmaText, 725, 850, 160, 75);
+    nC.addChild(this.karmaText, 739, 850, 130, 75);
     //-------------------------
     let arrow = new ImageButton().setImage("right arrow.png");
     arrow.setImageSize(50);
     nC.addChild(arrow, 1525, 25, 50, 50);
     //-------------------------
-    let t = this;
     arrow.onClicked.add(function () {
       characteristics.HideUI();
       t.HideUI();
       reputation.ShowUI();
     });
+    //-------------------------
+    this.growthRate = new Text().setText("15").setFont(nameFont);
+    this.growthRate.setFontSize(44);
+    nC.addChild(this.growthRate, 420, 765, 85, 85);
+  }
+
+  get GrowthRate() { return parseInt(this.growthRate.getText()); }
+  set GrowthRate(value) {
+    this.growthRate.setText(value * 2 + 5);
+    setTimeout(() => {
+      SetFreePoints(refObject.getName(), value * 2 + 5);
+    }, 100);
   }
 
   get Karma() { return this.karmaText.getText(); }
   set Karma(value) {
-    let brightness = (value >= 1000 && 0.01) || (value >= 750 && 0.2) || (value >= 500 && 0.25) || (value >= 250 && 0.5) || 1;
+    let absValue = Math.abs(value);
+    let brightness = (absValue >= 1000 && 0.01) || (absValue >= 750 && 0.2) || (absValue >= 500 && 0.25) || (absValue >= 250 && 0.5) || 1;
     if (value > 0) {
       this.karmaText.setText(value).setTextColor(new Color(brightness, 1, brightness));
     } else {
@@ -191,39 +204,35 @@ class Characteristics {
     this.hidePosition = position.add(new Vector(0, 0, -zPosition));
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
+    this.nCUI = CreateCanvasElement(nC, position.add(new Vector(0.15, -6, 0)), widgetWidth / 2, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
     let borderBaff = new Border();
     borderBaff.setColor(new Color(0.05, 0, 1));
-    nC.addChild(borderBaff, 1250, 100, 40, 40);
+    nC.addChild(borderBaff, 250, 100, 40, 40);
     //-------------------------
     let borderDebaff = new Border();
     borderDebaff.setColor(new Color(1, 0, 0.05));
-    nC.addChild(borderDebaff, 1380, 100, 40, 40);
+    nC.addChild(borderDebaff, 380, 100, 40, 40);
     //-------------------------
     let borderMain = new Border();
     borderMain.setColor(new Color(0.05, 1, 0.05));
-    nC.addChild(borderMain, 1510, 100, 40, 40);
+    nC.addChild(borderMain, 510, 100, 40, 40);
     //-------------------------
     for (let i = 0; i < countChar; i++) {
-      nC.addChild(majorCharacteristics[i], 1135, 145 + i * 78, 70, 65);
-      CreateCharacteristicTextBox(nC, i, position.add(new Vector(1250, 140 + i * 78, 0)), baffCharacteristics);
-      CreateCharacteristicTextBox(nC, i, position.add(new Vector(1380, 140 + i * 78, 0)), debaffCharacteristics);
-      CreateCharacteristicTextBox(nC, i, position.add(new Vector(1510, 140 + i * 78, 0)), mainCharacteristics);
+      nC.addChild(majorCharacteristics[i], 135, 145 + i * 78, 70, 65);
+      CreateCharacteristicTextBox(nC, i, position.add(new Vector(250, 140 + i * 78, 0)), baffCharacteristics);
+      CreateCharacteristicTextBox(nC, i, position.add(new Vector(380, 140 + i * 78, 0)), debaffCharacteristics);
+      CreateCharacteristicTextBox(nC, i, position.add(new Vector(510, 140 + i * 78, 0)), mainCharacteristics);
     }
-    //-------------------------
-    this.growthRate = new Text().setText("15").setFont(nameFont);
-    this.growthRate.setFontSize(44);
-    nC.addChild(this.growthRate, 420, 765, 85, 85);
     //-------------------------
     this.freePoints = new Text().setText("5").setFont(nameFont);
     this.freePoints.setFontSize(44);
-    nC.addChild(this.freePoints, 1340, 735, 85, 85);
+    nC.addChild(this.freePoints, 340, 735, 85, 85);
     //-------------------------
     this.maxPoints = new Text().setText("/" + this.maxPointsVal).setFont(nameFont);
     this.maxPoints.setFontSize(44);
-    nC.addChild(this.maxPoints, 1400, 735, 105, 85);
+    nC.addChild(this.maxPoints, 400, 735, 105, 85);
   }
 
   RecalculationFreePoints(currentPoints) {
@@ -231,14 +240,6 @@ class Characteristics {
   }
 
   get FreePoints() { return parseInt(this.freePoints.getText()); }
-
-  get GrowthRate() { return parseInt(this.growthRate.getText()); }
-  set GrowthRate(value) {
-    this.growthRate.setText(value * 2 + 5);
-    setTimeout(() => {
-      SetFreePoints(refObject.getName(), value * 2 + 5);
-    }, 100);
-  }
 
   HideUI() {
     this.nCUI.position = this.hidePosition;
@@ -369,6 +370,6 @@ refObject.SetHealthActionPlate = (plate1, plate2) => {
   actionPlate = plate2;
 }
 
-refObject.ShudderMajor = () => {
-  majorCharacteristics[TypeCharacteristic.endurance].setText(valueMajorC[TypeCharacteristic.endurance] + " ");
+refObject.ChangeMaxHealth = () => {
+  healthPlate.SetMaxValue(valueMajorC[TypeCharacteristic.strenght], valueMajorC[TypeCharacteristic.endurance], GetCurrentLevel());
 }

@@ -1,4 +1,4 @@
-const { refObject, ImageButton, Text, TextBox, Vector } = require('@tabletop-playground/api');
+const { refObject } = require('@tabletop-playground/api');
 const { SetIdObject, TypeCharacteristic, CreateCanvasElement } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
@@ -114,7 +114,7 @@ class SkillsMajor {
     this.freeSPValue = 0;
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
+    this.nCUI = CreateCanvasElement(nC, position.add(new Vector(0.1, 0, 0)), widgetWidth, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
     let offsetY = 0; let offsetX = 440; let offsetButtonX = 30;

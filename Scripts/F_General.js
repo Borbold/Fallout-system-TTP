@@ -1,4 +1,4 @@
-const { refObject, Button, ImageButton, Text, Vector } = require('@tabletop-playground/api');
+const { refObject } = require('@tabletop-playground/api');
 const { ChangeImageSlider, PositionsFontUI, TypeShow, CreateCanvasElement } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 let figurePlate;
@@ -40,7 +40,7 @@ class HelthPoints {
     this.startPosition = position.add(new Vector(offsetX, 0, 0));
     //-------------------------
     let nC = new Canvas();
-    let nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
+    let nCUI = CreateCanvasElement(nC, position.add(new Vector(-1.25, 0, 0)), widgetWidth, widgetHeight / 2);
     parent.attachUI(nCUI);
     //-------------------------
     this.changedButton = new Button().setText("1").setFont(nameFont);
@@ -162,16 +162,16 @@ class ActionPoints {
     this.startPosition = position.add(offsetVec);
     //-------------------------
     let nC = new Canvas();
-    let nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
+    let nCUI = CreateCanvasElement(nC, position.add(new Vector(0.6, 0, 0)), widgetWidth, widgetHeight / 2);
     parent.attachUI(nCUI);
     //-------------------------
     this.changedButton = new Button().setText("1").setFont(nameFont);
     this.changedButton.setFontSize(40);
-    nC.addChild(this.changedButton, 440, 360, 100, 80);
+    nC.addChild(this.changedButton, 440, 180, 100, 80);
     //-------------------------
     this.backText = new Button().setText(this.quantityAction + "/" + this.maxAction + " max").setFont(nameFont);
     this.backText.setFontSize(40);
-    nC.addChild(this.backText, 15, 360, 350, 80);
+    nC.addChild(this.backText, 15, 180, 350, 80);
     //-------------------------
     for (let i = 0; i < this.totalAction; i++) {
       this.positionsActionX.push(-i / 1.5);
@@ -194,11 +194,11 @@ class ActionPoints {
     //-------------------------
     this.decrement = new ImageButton().setImage("minus.png");
     this.decrement.setImageSize(100);
-    nC.addChild(this.decrement, 390, 275, 60, 60);
+    nC.addChild(this.decrement, 390, 90, 60, 60);
     //-------------------------
     this.increment = new ImageButton().setImage("plus.png");
     this.increment.setImageSize(100);
-    nC.addChild(this.increment, 1490, 275, 60, 60);
+    nC.addChild(this.increment, 1490, 90, 60, 60);
     //-------------------------
     let t = this;
     let boxTable = [1, 2, 4];

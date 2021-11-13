@@ -171,7 +171,7 @@ class Status {
     this.hidePosition = position.add(new Vector(0, 0, -zPosition));
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
+    this.nCUI = CreateCanvasElement(nC, position.add(new Vector(0.15, 4, 0)), widgetWidth / 2, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
     let maxStatus = new Text().setText("/1000").setFont(nameFont);
@@ -201,31 +201,31 @@ class Status2 {
     this.hidePosition = position.add(new Vector(0, 0, -zPosition));
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
+    this.nCUI = CreateCanvasElement(nC, position.add(new Vector(0.15, -6, 0)), widgetWidth / 2, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
     let borderBaff = new Border();
     borderBaff.setColor(new Color(0.05, 0, 1));
-    nC.addChild(borderBaff, 1250, 100, 40, 40);
+    nC.addChild(borderBaff, 250, 100, 40, 40);
     //-------------------------
     let borderDebaff = new Border();
     borderDebaff.setColor(new Color(1, 0, 0.05));
-    nC.addChild(borderDebaff, 1380, 100, 40, 40);
+    nC.addChild(borderDebaff, 380, 100, 40, 40);
     //-------------------------
     let borderMain = new Border();
     borderMain.setColor(new Color(0.05, 1, 0.05));
-    nC.addChild(borderMain, 1510, 100, 40, 40);
+    nC.addChild(borderMain, 510, 100, 40, 40);
     //-------------------------
     for (let i = 0; i < countStatus2; i++) {
-      nC.addChild(majorStatus2[i], 1100, 152 + i * 74, 70, 65);
-      CreateCharacteristicTextBox(nC, i, position.add(new Vector(1250, 147 + i * 74, 0)), baffStatus2);
-      CreateCharacteristicTextBox(nC, i, position.add(new Vector(1380, 147 + i * 74, 0)), debaffStatus2);
-      CreateCharacteristicTextBox(nC, i, position.add(new Vector(1510, 147 + i * 74, 0)), mainStatus2, true);
+      nC.addChild(majorStatus2[i], 100, 152 + i * 74, 70, 65);
+      CreateCharacteristicTextBox(nC, i, position.add(new Vector(250, 147 + i * 74, 0)), baffStatus2);
+      CreateCharacteristicTextBox(nC, i, position.add(new Vector(380, 147 + i * 74, 0)), debaffStatus2);
+      CreateCharacteristicTextBox(nC, i, position.add(new Vector(510, 147 + i * 74, 0)), mainStatus2, true);
     }
     //-------------------------
     let arrow = new ImageButton().setImage("right arrow.png");
     arrow.setImageSize(50);
-    nC.addChild(arrow, 1525, 25, 50, 50);
+    nC.addChild(arrow, 525, 25, 50, 50);
     //-------------------------
     let t = this;
     arrow.onClicked.add(function () {

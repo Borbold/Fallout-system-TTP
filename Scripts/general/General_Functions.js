@@ -32,12 +32,12 @@ function SetFreePoints(name, value) {
 }
 module.exports.SetFreePoints = SetFreePoints;
 
-function ChangeMaxHealth(name) {
+function ChangeMaxValue(name) {
   for (let i = 0; i < ids.length; i++) {
     if (idObjects[name + ids[i]]) {
       let o = world.getObjectById(idObjects[name + ids[i]]);
-      if (o.ShudderMajor) {
-        o.ShudderMajor();
+      if (o.ChangeMaxHealth) {
+        o.ChangeMaxHealth();
         break;
       }
     }
@@ -47,7 +47,7 @@ function ChangeMaxHealth(name) {
 function SetCurrentLevel(name, value) {
   currentLevel = value;
   SetFreePoints(name, currentFreePoints);
-  ChangeMaxHealth(name);
+  ChangeMaxValue(name);
 }
 module.exports.SetCurrentLevel = SetCurrentLevel;
 function GetCurrentLevel() {
@@ -90,7 +90,7 @@ module.exports.TypeShow = TypeShow;
 function ChangeImageSlider(image, value, maxValue, position, text, parent, startX, type, multiply) {
   type = type || TypeShow.STANDART; multiply = multiply || 10;
   let procent = parseInt((100 * value) / maxValue);
-  image.width = procent * multiply;
+  image.width = procent * multiply || 1;
   image.position = position.add(new Vector(0, PositionsFontUI(startX, image.width), 0));
   if (TypeShow.STANDART == type)
     text.setText(value + "/" + maxValue);
@@ -105,14 +105,12 @@ function CreateCanvasElement(nC, position, widgetWidth, widgetHeight) {
   nCUI.useWidgetSize = false;
   nCUI.position = position;
   nCUI.rotation = new Rotator(0, 0, 180);
-  nCUI.widget = nC;
+  if (nC) {
+    nCUI.widget = nC;
+  }
   nCUI.width = widgetWidth;
   nCUI.height = widgetHeight;
   nCUI.scale = 0.1;
-  //-------------------------
-  //let image = new ImageWidget().setImage("reput3.png");
-  //nC.addChild(image, 0, 0, widgetWidth, widgetHeight);
-  //-------------------------
   return nCUI;
 }
 module.exports.CreateCanvasElement = CreateCanvasElement;
