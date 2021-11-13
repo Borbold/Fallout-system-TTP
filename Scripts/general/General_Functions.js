@@ -1,7 +1,4 @@
-const { Vector } = require('@tabletop-playground/api');
-//-----------------------------------------------------------------
-let idObjects = [];
-let ids = [];
+let idObjects = [], ids = [];
 //-----------------------------------------------------------------
 function SetIdObject(name, id) {
   idObjects[name + id] = id;
@@ -26,16 +23,31 @@ function SetFreePoints(name, value) {
   for (let i = 0; i < ids.length; i++) {
     if (idObjects[name + ids[i]]) {
       let o = world.getObjectById(idObjects[name + ids[i]]);
-      if (o.SetFreeSkillPoint)
+      if (o.SetFreeSkillPoint) {
         o.SetFreeSkillPoint(value * currentLevel);
+        break;
+      }
     }
   }
 }
 module.exports.SetFreePoints = SetFreePoints;
 
+function ChangeMaxHealth(name) {
+  for (let i = 0; i < ids.length; i++) {
+    if (idObjects[name + ids[i]]) {
+      let o = world.getObjectById(idObjects[name + ids[i]]);
+      if (o.ShudderMajor) {
+        o.ShudderMajor();
+        break;
+      }
+    }
+  }
+}
+
 function SetCurrentLevel(name, value) {
   currentLevel = value;
   SetFreePoints(name, currentFreePoints);
+  ChangeMaxHealth(name);
 }
 module.exports.SetCurrentLevel = SetCurrentLevel;
 function GetCurrentLevel() {
@@ -97,6 +109,10 @@ function CreateCanvasElement(nC, position, widgetWidth, widgetHeight) {
   nCUI.width = widgetWidth;
   nCUI.height = widgetHeight;
   nCUI.scale = 0.1;
+  //-------------------------
+  //let image = new ImageWidget().setImage("reput3.png");
+  //nC.addChild(image, 0, 0, widgetWidth, widgetHeight);
+  //-------------------------
   return nCUI;
 }
 module.exports.CreateCanvasElement = CreateCanvasElement;

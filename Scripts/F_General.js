@@ -1,5 +1,5 @@
 const { refObject, Button, ImageButton, Text, Vector } = require('@tabletop-playground/api');
-const { ChangeImageSlider, PositionsFontUI, TypeShow, CreateCanvasElement, GetCurrentLevel } = require('./general/General_Functions.js');
+const { ChangeImageSlider, PositionsFontUI, TypeShow, CreateCanvasElement } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 let figurePlate;
 refObject.onCreated.add(() => {
@@ -123,16 +123,17 @@ class HelthPoints {
   get changedValue() { return parseInt(this.changedButton.getText()); }
   set changedValue(number) { this.changedButton.setText(number.toString()); }
 
-  SetMaxValue(strenght, endurance) {
+  SetMaxValue(strenght, endurance, currentLevel) {
     let newMax = 0;
-    for (let i = 1; i <= GetCurrentLevel(); i++) {
+    for (let i = 1; i <= currentLevel; i++) {
       if (i == 1) {
         newMax += 15 + strenght + endurance * 2;
       } else {
-        newMax += (parseInt(endurance / 2) + 2) * GetCurrentLevel();
+        newMax += (parseInt(endurance / 2) + 2) * currentLevel;
       }
     }
     this.maxHelthValue = newMax;
+
     if (this.value > newMax) {
       this.value = newMax;
     } else {
@@ -140,6 +141,9 @@ class HelthPoints {
         this.helthUI, this.value, newMax, this.startPosition, this.fontText, this.parent, this.startImageSliderPosX, TypeShow.PROCENT);
       this.backText.setText(this.value + "/" + newMax + " max");
     }
+  }
+  set maxValue(value) {
+    this.maxHelthValue = value;
   }
 }
 let helthPoint = new HelthPoints(refObject, new Vector(0, 0, zPosition));
@@ -248,13 +252,15 @@ class ActionPoints {
 
   SetMaxValue(dextery) {
     this.maxAction = parseInt(5 + dextery / 2);
-    if (this.maxAction < this.totalAction) {
-      if (this.value > this.maxAction) {
-        this.value = this.maxAction;
-      } else {
-        this.backText.setText(this.value + "/" + this.maxAction + " max");
-      }
+
+    if (this.value > this.maxAction) {
+      this.value = this.maxAction;
+    } else {
+      this.backText.setText(this.value + "/" + this.maxAction + " max");
     }
+  }
+  set maxValue(value) {
+    this.maxAction = value;
   }
 
   get changedValue() { return parseInt(this.changedButton.getText()); }
@@ -288,7 +294,7 @@ function loadState() {
 refObject.ResetValue = function () {
   helthPoint.value = 30;
   actionPoint.value = 7;
-  helthPoint.SetMaxValue(30);
-  actionPoint.SetMaxValue(7);
+  helthPoint.maxValue = 30;
+  actionPoint.maxValue = 7;
   saveState();
 }

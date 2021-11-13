@@ -1,4 +1,4 @@
-const { refObject, Button, ImageButton, Text, TextBox, Vector } = require('@tabletop-playground/api');
+const { refObject } = require('@tabletop-playground/api');
 const { SetIdObject, TypeCharacteristic, CreateCanvasElement } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {

@@ -1,4 +1,4 @@
-﻿const { refObject, Button, ImageButton, Text, Vector, world } = require('@tabletop-playground/api');
+﻿const { refObject, world } = require('@tabletop-playground/api');
 const { ChangeImageSlider, PositionsFontUI, SetCurrentLevel, CreateCanvasElement } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {

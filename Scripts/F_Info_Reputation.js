@@ -1,5 +1,5 @@
-const { refObject, ImageButton, ImageWidget, Text, TextBox, Vector } = require('@tabletop-playground/api');
-const { SetValueChars, TypeCharacteristic, SetFreePoints, SetIdObject, CreateCanvasElement } = require('./general/General_Functions.js');
+const { refObject } = require('@tabletop-playground/api');
+const { SetValueChars, TypeCharacteristic, SetFreePoints, SetIdObject, CreateCanvasElement, GetCurrentLevel } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   SetIdObject(refObject.getName(), refObject.getId());
@@ -54,7 +54,7 @@ for (let i = 0; i < countChar; i++) {
     if (i == TypeCharacteristic.intelligence) {
       characteristics.GrowthRate = value;
     } else if (i == TypeCharacteristic.strenght || i == TypeCharacteristic.endurance) {
-      healthPlate.SetMaxValue(valueMajorC[TypeCharacteristic.strenght], valueMajorC[TypeCharacteristic.endurance]);
+      healthPlate.SetMaxValue(valueMajorC[TypeCharacteristic.strenght], valueMajorC[TypeCharacteristic.endurance], GetCurrentLevel());
     } else if (i == TypeCharacteristic.dextery) {
       actionPlate.SetMaxValue(valueMajorC[TypeCharacteristic.strenght]);
     }
@@ -367,4 +367,8 @@ let healthPlate, actionPlate;
 refObject.SetHealthActionPlate = (plate1, plate2) => {
   healthPlate = plate1;
   actionPlate = plate2;
+}
+
+refObject.ShudderMajor = () => {
+  majorCharacteristics[TypeCharacteristic.endurance].setText(valueMajorC[TypeCharacteristic.endurance] + " ");
 }
