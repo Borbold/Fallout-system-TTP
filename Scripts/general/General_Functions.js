@@ -114,3 +114,12 @@ function CreateCanvasElement(nC, position, widgetWidth, widgetHeight) {
   return nCUI;
 }
 module.exports.CreateCanvasElement = CreateCanvasElement;
+//-----------------------------------------------------------------
+function GetTextFont() {
+  return "Fallout.ttf";
+}
+module.exports.GetTextFont = GetTextFont;
+function GetTextColor() {
+  return new Color(1, 0.71, 0.25);
+}
+module.exports.GetTextColor = GetTextColor;

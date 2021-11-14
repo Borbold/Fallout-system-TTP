@@ -1,5 +1,5 @@
 const { refObject } = require('@tabletop-playground/api');
-const { ChangeImageSlider, PositionsFontUI, TypeShow, CreateCanvasElement } = require('./general/General_Functions.js');
+const { ChangeImageSlider, PositionsFontUI, TypeShow, CreateCanvasElement, GetTextFont, GetTextColor } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 let figurePlate;
 refObject.onCreated.add(() => {
@@ -26,7 +26,8 @@ refObject.onCreated.add(() => {
 const zPosition = 0.1;
 const widgetWidth = 1600;
 const widgetHeight = 500;
-const nameFont = "Fallout.ttf";
+let nameFont = GetTextFont();
+let textColor = GetTextColor();
 //-----------------------------------------------------------------
 class HelthPoints {
   helthUI = new UIElement();
@@ -43,11 +44,11 @@ class HelthPoints {
     let nCUI = CreateCanvasElement(nC, position.add(new Vector(-1.25, 0, 0)), widgetWidth, widgetHeight / 2);
     parent.attachUI(nCUI);
     //-------------------------
-    this.changedButton = new Button().setText("1").setFont(nameFont);
+    this.changedButton = new Button().setText("1").setFont(nameFont).setTextColor(textColor);
     this.changedButton.setFontSize(40);
     nC.addChild(this.changedButton, 440, 180, 100, 80);
     //-------------------------
-    this.backText = new Button().setText(this.helthValue + "/" + this.maxHelthValue + " max").setFont(nameFont);
+    this.backText = new Button().setText(this.helthValue + "/" + this.maxHelthValue + " max").setFont(nameFont).setTextColor(textColor);
     this.backText.setFontSize(40);
     nC.addChild(this.backText, 15, 180, 350, 80);
     //-------------------------
@@ -70,11 +71,11 @@ class HelthPoints {
     this.increment.setImageSize(100);
     nC.addChild(this.increment, 1490, 90, 60, 60);
     //-------------------------
-    this.fontText = new Text().setText("%").setTextColor(new Color(0.75, 0.75, 0.75)).setFont(nameFont);
+    this.fontText = new Text().setText("%").setTextColor(new Color(0.75, 0.75, 0.75)).setFont(nameFont).setTextColor(textColor);
     this.fontText.setFontSize(18);
 
     let fountTextUI = new UIElement();
-    fountTextUI.position = position.add(new Vector(offsetX, -1.7, 0.01));
+    fountTextUI.position = position.add(new Vector(offsetX + 0.05, -1.7, 0.01));
     fountTextUI.rotation = new Rotator(0, 0, 180);
     fountTextUI.widget = this.fontText;
     fountTextUI.scale = 0.2;
@@ -165,11 +166,11 @@ class ActionPoints {
     let nCUI = CreateCanvasElement(nC, position.add(new Vector(0.6, 0, 0)), widgetWidth, widgetHeight / 2);
     parent.attachUI(nCUI);
     //-------------------------
-    this.changedButton = new Button().setText("1").setFont(nameFont);
+    this.changedButton = new Button().setText("1").setFont(nameFont).setTextColor(textColor);
     this.changedButton.setFontSize(40);
     nC.addChild(this.changedButton, 440, 180, 100, 80);
     //-------------------------
-    this.backText = new Button().setText(this.quantityAction + "/" + this.maxAction + " max").setFont(nameFont);
+    this.backText = new Button().setText(this.quantityAction + "/" + this.maxAction + " max").setFont(nameFont).setTextColor(textColor);
     this.backText.setFontSize(40);
     nC.addChild(this.backText, 15, 180, 350, 80);
     //-------------------------

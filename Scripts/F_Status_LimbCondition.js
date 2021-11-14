@@ -1,5 +1,5 @@
 const { refObject } = require('@tabletop-playground/api');
-const { SetIdObject, TypeCharacteristic, CreateCanvasElement } = require('./general/General_Functions.js');
+const { SetIdObject, TypeCharacteristic, CreateCanvasElement, GetTextFont, GetTextColor } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   SetIdObject(refObject.getName(), refObject.getId());
@@ -9,13 +9,14 @@ refObject.onCreated.add(() => {
 const zPosition = 0.1;
 const widgetWidth = 1600;
 const widgetHeight = 800;
-const nameFont = "Fallout.ttf";
+let nameFont = GetTextFont();
+let textColor = GetTextColor();
 //-----------------------------------------------------------------
 const countStatus = 6;
 let allStatus = [], statusValue = [];
 for (let i = 0; i < countStatus; i++) {
   statusValue[i] = "0";
-  allStatus[i] = new TextBox().setText("0").setMaxLength(4).setFont(nameFont);
+  allStatus[i] = new TextBox().setText("0").setMaxLength(4).setFont(nameFont).setTextColor(textColor);
   allStatus[i].setFontSize(38);
   allStatus[i].setInputType(4);
   allStatus[i].onTextCommitted.add((_1, _2, text) => {
@@ -35,7 +36,7 @@ for (let i = 0; i < countLimb; i++) {
   reducedDamage[i].setFontSize(40);
   //-----------------
   allLimbValue[i] = "100%";
-  allLimb[i] = new TextBox().setText("100%").setEnabled(false).setFont(nameFont);
+  allLimb[i] = new TextBox().setText("100%").setEnabled(false).setFont(nameFont).setTextColor(textColor);
   allLimb[i].setFontSize(34);
   allLimb[i].onTextCommitted.add((_1, _2, text) => {
     allLimbValue[i] = text;
@@ -61,7 +62,7 @@ let mainStatus2 = [], mainStatusValue = [];
 let startValueMainStatus = [];
 let additionValueMain = [];
 for (let i = 0; i < countStatus2; i++) {
-  majorStatus2[i] = new TextBox().setText("0").setEnabled(false).setFont(nameFont);
+  majorStatus2[i] = new TextBox().setText("0").setEnabled(false).setFont(nameFont).setTextColor(textColor);
   majorStatus2[i].setFontSize(38);
   majorStatus2[i].onTextCommitted.add(() => {
     if (i == "intelligence") {
@@ -72,7 +73,7 @@ for (let i = 0; i < countStatus2; i++) {
   })
   //--
   baffStatusValue[i] = 0;
-  baffStatus2[i] = new TextBox().setText("0").setInputType(4).setFont(nameFont);
+  baffStatus2[i] = new TextBox().setText("0").setInputType(4).setFont(nameFont).setTextColor(textColor);
   baffStatus2[i].setFontSize(20);
   baffStatus2[i].onTextCommitted.add((_1, _2, text) => {
     baffStatusValue[i] = text;
@@ -80,7 +81,7 @@ for (let i = 0; i < countStatus2; i++) {
   })
   //--
   debaffStatusValue[i] = 0;
-  debaffStatus2[i] = new TextBox().setText("0").setInputType(4).setFont(nameFont);
+  debaffStatus2[i] = new TextBox().setText("0").setInputType(4).setFont(nameFont).setTextColor(textColor);
   debaffStatus2[i].setFontSize(20);
   debaffStatus2[i].onTextCommitted.add((_1, _2, text) => {
     debaffStatusValue[i] = text;
@@ -88,7 +89,7 @@ for (let i = 0; i < countStatus2; i++) {
   })
   //--
   mainStatusValue[i] = 0;
-  mainStatus2[i] = new TextBox().setText("0").setInputType(4).setFont(nameFont);
+  mainStatus2[i] = new TextBox().setText("0").setInputType(4).setFont(nameFont).setTextColor(textColor);
   mainStatus2[i].setFontSize(20);
   mainStatus2[i].onTextCommitted.add((_1, _2, text) => {
     mainStatusValue[i] = text;
@@ -167,14 +168,15 @@ function CreateLimbConditionTextBox(parent, canvas, index, position, array) {
 class Status {
   constructor(parent, position) {
     this.parent = parent;
-    this.showPosition = position;
-    this.hidePosition = position.add(new Vector(0, 0, -zPosition));
+    let backUIPos = position.add(new Vector(0.15, 4, 0));
+    this.showPosition = backUIPos;
+    this.hidePosition = backUIPos.add(new Vector(0, 0, -zPosition));
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position.add(new Vector(0.15, 4, 0)), widgetWidth / 2, widgetHeight);
+    this.nCUI = CreateCanvasElement(nC, backUIPos, widgetWidth / 2, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
-    let maxStatus = new Text().setText("/1000").setFont(nameFont);
+    let maxStatus = new Text().setText("/1000").setFont(nameFont).setTextColor(textColor);
     maxStatus.setFontSize(38);
     for (let i = 0; i < countStatus; i++) {
       nC.addChild(allStatus[i], 380, 152 + i * 74, 130, 65);
@@ -197,11 +199,12 @@ class Status2 {
   constructor(parent, position) {
     this.parent = parent;
     this.maxPointsVal = 40;
-    this.showPosition = position;
-    this.hidePosition = position.add(new Vector(0, 0, -zPosition));
+    let backUIPos = position.add(new Vector(0.15, -6, 0));
+    this.showPosition = backUIPos;
+    this.hidePosition = backUIPos.add(new Vector(0, 0, -zPosition));
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position.add(new Vector(0.15, -6, 0)), widgetWidth / 2, widgetHeight);
+    this.nCUI = CreateCanvasElement(nC, backUIPos, widgetWidth / 2, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
     let borderBaff = new Border();
@@ -266,7 +269,7 @@ class LimbCondition {
       if (i == countLimb / 2 - 1) { offsetY = -1; offsetX = 1410; }
     }
     //-------------------------
-    this.changedButton = new Button().setText("1").setFont(nameFont);
+    this.changedButton = new Button().setText("1").setFont(nameFont).setTextColor(textColor);
     this.changedButton.setFontSize(40);
     nC.addChild(this.changedButton, 780, 680, 70, 80);
     //-------------------------

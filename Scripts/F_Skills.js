@@ -1,5 +1,5 @@
 const { refObject } = require('@tabletop-playground/api');
-const { SetIdObject, TypeCharacteristic, CreateCanvasElement } = require('./general/General_Functions.js');
+const { SetIdObject, TypeCharacteristic, CreateCanvasElement, GetTextFont, GetTextColor } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   SetIdObject(refObject.getName(), refObject.getId());
@@ -8,7 +8,8 @@ refObject.onCreated.add(() => {
 const zPosition = 0.1;
 const widgetWidth = 1600;
 const widgetHeight = 1000;
-const nameFont = "Fallout.ttf";
+let nameFont = GetTextFont();
+let textColor = GetTextColor();
 //-----------------------------------------------------------------
 let selectedSkills = [], countSelected = 0;
 const countSkills = 19;
@@ -19,14 +20,14 @@ let mainSkills = [], mainValues = [];
 let startValueMainSkills = [];
 let additionValueMain = [];
 for (let i = 0; i < countSkills; i++) {
-  majorSkills[i] = new TextBox().setText("0").setEnabled(false).setFont(nameFont);
+  majorSkills[i] = new TextBox().setText("0").setEnabled(false).setFont(nameFont).setTextColor(textColor);
   majorSkills[i].setFontSize(40);
   majorSkills[i].onTextCommitted.add(() => {
     saveState();
   })
   //--
   baffValues[i] = "0";
-  baffSkills[i] = new TextBox().setText("0").setInputType(4).setFont(nameFont);
+  baffSkills[i] = new TextBox().setText("0").setInputType(4).setFont(nameFont).setTextColor(textColor);
   baffSkills[i].setFontSize(40);
   baffSkills[i].onTextCommitted.add((_1, _2, text) => {
     baffValues[i] = text;
@@ -34,7 +35,7 @@ for (let i = 0; i < countSkills; i++) {
   })
   //--
   debaffValues[i] = "0";
-  debaffSkills[i] = new TextBox().setText("0").setInputType(4).setFont(nameFont);
+  debaffSkills[i] = new TextBox().setText("0").setInputType(4).setFont(nameFont).setTextColor(textColor);
   debaffSkills[i].setFontSize(40);
   debaffSkills[i].onTextCommitted.add((_1, _2, text) => {
     debaffValues[i] = text;
@@ -42,7 +43,7 @@ for (let i = 0; i < countSkills; i++) {
   })
   //--
   mainValues[i] = "0";
-  mainSkills[i] = new TextBox().setText("0").setInputType(4).setFont(nameFont);
+  mainSkills[i] = new TextBox().setText("0").setInputType(4).setFont(nameFont).setTextColor(textColor);
   mainSkills[i].setFontSize(40);
   mainSkills[i].onTextCommitted.add((_1, _2, text) => {
     mainValues[i] = text;
@@ -125,7 +126,7 @@ class SkillsMajor {
       if (i == 9) { offsetY = -1; offsetX = 1170; offsetButtonX = 825; }
     }
     //-------------------------
-    this.freeSkillPoint = new Text().setText("0").setFont(nameFont);
+    this.freeSkillPoint = new Text().setText("0").setFont(nameFont).setTextColor(textColor);
     this.freeSkillPoint.setFontSize(44);
     nC.addChild(this.freeSkillPoint, 775, 870, 170, 90);
     //-------------------------

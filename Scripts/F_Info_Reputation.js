@@ -1,5 +1,5 @@
 const { refObject } = require('@tabletop-playground/api');
-const { SetValueChars, TypeCharacteristic, SetFreePoints, SetIdObject, CreateCanvasElement, GetCurrentLevel } = require('./general/General_Functions.js');
+const { SetValueChars, TypeCharacteristic, SetFreePoints, SetIdObject, CreateCanvasElement, GetCurrentLevel, GetTextFont, GetTextColor } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   SetIdObject(refObject.getName(), refObject.getId());
@@ -11,14 +11,15 @@ refObject.onCreated.add(() => {
 const zPosition = 0.1;
 const widgetWidth = 1600;
 const widgetHeight = 1000;
-const nameFont = "Fallout.ttf";
+let nameFont = GetTextFont();
+let textColor = GetTextColor();
 //-----------------------------------------------------------------
 let countInfo = 7;
 let allInfoText = [];
 let allInfoTB = [];
 for (let i = 0; i < countInfo; i++) {
   allInfoText[i] = "...";
-  allInfoTB[i] = new TextBox().setText("...").setFont(nameFont);
+  allInfoTB[i] = new TextBox().setText("...").setFont(nameFont).setTextColor(textColor);
   allInfoTB[i].setFontSize(44);
   allInfoTB[i].onTextCommitted.add((_1, _2, text) => {
     allInfoText[i] = text;
@@ -31,7 +32,7 @@ let allReputation = [];
 let reputationValues = [];
 for (let i = 0; i < countReputation; i++) {
   reputationValues[i] = 0;
-  allReputation[i] = new TextBox().setText("0").setFont(nameFont);
+  allReputation[i] = new TextBox().setText("0").setFont(nameFont).setTextColor(textColor);
   allReputation[i].setFontSize(34);
   allReputation[i].onTextCommitted.add((_1, _2, text) => {
     reputationValues[i] = text;
@@ -47,7 +48,7 @@ let mainCharacteristics = [], valueMainC = [];
 let additionValueMain = [];
 for (let i = 0; i < countChar; i++) {
   valueMajorC[i] = 5;
-  majorCharacteristics[i] = new TextBox().setFont(nameFont).setEnabled(false);
+  majorCharacteristics[i] = new TextBox().setFont(nameFont).setEnabled(false).setTextColor(textColor);
   majorCharacteristics[i].setFontSize(40);
   majorCharacteristics[i].onTextCommitted.add(() => {
     let value = parseInt(majorCharacteristics[i].getText());
@@ -63,7 +64,7 @@ for (let i = 0; i < countChar; i++) {
   })
   //--
   valueBaffC[i] = 0;
-  baffCharacteristics[i] = new TextBox().setText("0").setInputType(4).setFont(nameFont);
+  baffCharacteristics[i] = new TextBox().setText("0").setInputType(4).setFont(nameFont).setTextColor(textColor);
   baffCharacteristics[i].setFontSize(20);
   baffCharacteristics[i].onTextCommitted.add((_1, _2, text) => {
     valueBaffC[i] = text;
@@ -71,7 +72,7 @@ for (let i = 0; i < countChar; i++) {
   })
   //--
   valueDebaffC[i] = 0;
-  debaffCharacteristics[i] = new TextBox().setText("0").setInputType(4).setFont(nameFont);
+  debaffCharacteristics[i] = new TextBox().setText("0").setInputType(4).setFont(nameFont).setTextColor(textColor);
   debaffCharacteristics[i].setFontSize(20);
   debaffCharacteristics[i].onTextCommitted.add((_1, _2, text) => {
     valueDebaffC[i] = text;
@@ -79,7 +80,7 @@ for (let i = 0; i < countChar; i++) {
   })
   //--
   valueMainC[i] = 5;
-  mainCharacteristics[i] = new TextBox().setText("5").setInputType(4).setFont(nameFont);
+  mainCharacteristics[i] = new TextBox().setText("5").setInputType(4).setFont(nameFont).setTextColor(textColor);
   mainCharacteristics[i].setFontSize(20);
   mainCharacteristics[i].onTextCommitted.add((_1, _2, text) => {
     valueMainC[i] = text;
@@ -130,20 +131,20 @@ function CreateCharacteristicTextBox(parent, index, position, typeChar) {
 //-----------------------------------------------------------------
 class Info {
   constructor(parent, position) {
-    let t = this;
     this.parent = parent;
-    this.showPosition = position;
-    this.hidePosition = position.add(new Vector(0, 0, -zPosition));
+    let backUIPos = position.add(new Vector(0, 3.5, 0));
+    this.showPosition = backUIPos;
+    this.hidePosition = backUIPos.add(new Vector(0, 0, -zPosition));
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position.add(new Vector(0, 3.5, 0)), widgetWidth / 2 + 100, widgetHeight);
+    this.nCUI = CreateCanvasElement(nC, backUIPos, widgetWidth / 2 + 100, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
     for (let i = 0; i < countInfo; i++) {
       nC.addChild(allInfoTB[i], 330, 135 + i * 78, 400, 75);
     }
     //-------------------------
-    this.karmaText = new TextBox().setInputType(3).setText("0").setFont(nameFont);
+    this.karmaText = new TextBox().setInputType(3).setText("0").setFont(nameFont).setTextColor(textColor);
     this.karmaText.setFontSize(44);
     this.karmaText.onTextCommitted.add((_1, _2, text) => {
       this.Karma = parseInt(text);
@@ -151,17 +152,7 @@ class Info {
     })
     nC.addChild(this.karmaText, 739, 850, 130, 75);
     //-------------------------
-    let arrow = new ImageButton().setImage("right arrow.png");
-    arrow.setImageSize(50);
-    nC.addChild(arrow, 1525, 25, 50, 50);
-    //-------------------------
-    arrow.onClicked.add(function () {
-      characteristics.HideUI();
-      t.HideUI();
-      reputation.ShowUI();
-    });
-    //-------------------------
-    this.growthRate = new Text().setText("15").setFont(nameFont);
+    this.growthRate = new Text().setText("15").setFont(nameFont).setTextColor(textColor);
     this.growthRate.setFontSize(44);
     nC.addChild(this.growthRate, 420, 765, 85, 85);
   }
@@ -177,11 +168,11 @@ class Info {
   get Karma() { return this.karmaText.getText(); }
   set Karma(value) {
     let absValue = Math.abs(value);
-    let brightness = (absValue >= 1000 && 0.01) || (absValue >= 750 && 0.2) || (absValue >= 500 && 0.25) || (absValue >= 250 && 0.5) || 1;
+    let brightness = (absValue >= 1000 && 1) || (absValue >= 750 && 0.75) || (absValue >= 500 && 0.5) || (absValue >= 250 && 0.25) || 0.01;
     if (value > 0) {
-      this.karmaText.setText(value).setTextColor(new Color(brightness, 1, brightness));
+      this.karmaText.setText(value).setTextColor(new Color(textColor.r - brightness, 1, textColor.b - brightness));
     } else {
-      this.karmaText.setText(value).setTextColor(new Color(1, brightness, brightness));
+      this.karmaText.setText(value).setTextColor(new Color(1, textColor.g - brightness, textColor.b - brightness));
     }
   }
 
@@ -198,13 +189,15 @@ let info = new Info(refObject, new Vector(0, 0, zPosition));
 
 class Characteristics {
   constructor(parent, position) {
+    let t = this;
     this.parent = parent;
     this.maxPointsVal = 40;
-    this.showPosition = position;
-    this.hidePosition = position.add(new Vector(0, 0, -zPosition));
+    let backUIPos = position.add(new Vector(0.15, -6, 0));
+    this.showPosition = backUIPos;
+    this.hidePosition = backUIPos.add(new Vector(0, 0, -zPosition));
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position.add(new Vector(0.15, -6, 0)), widgetWidth / 2, widgetHeight);
+    this.nCUI = CreateCanvasElement(nC, backUIPos, widgetWidth / 2, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
     let borderBaff = new Border();
@@ -226,13 +219,22 @@ class Characteristics {
       CreateCharacteristicTextBox(nC, i, position.add(new Vector(510, 140 + i * 78, 0)), mainCharacteristics);
     }
     //-------------------------
-    this.freePoints = new Text().setText("5").setFont(nameFont);
+    this.freePoints = new Text().setText("5").setFont(nameFont).setTextColor(textColor);
     this.freePoints.setFontSize(44);
     nC.addChild(this.freePoints, 340, 735, 85, 85);
     //-------------------------
-    this.maxPoints = new Text().setText("/" + this.maxPointsVal).setFont(nameFont);
+    this.maxPoints = new Text().setText("/" + this.maxPointsVal).setFont(nameFont).setTextColor(textColor);
     this.maxPoints.setFontSize(44);
     nC.addChild(this.maxPoints, 400, 735, 105, 85);
+    //-------------------------
+    let arrow = new ImageButton().setImage("right arrow.png");
+    arrow.setImageSize(50);
+    nC.addChild(arrow, 525, 25, 50, 50);
+    arrow.onClicked.add(function () {
+      t.HideUI();
+      info.HideUI();
+      reputation.ShowUI();
+    });
   }
 
   RecalculationFreePoints(currentPoints) {

@@ -1,5 +1,5 @@
 const { refObject } = require('@tabletop-playground/api');
-const { CreateCanvasElement } = require('./general/General_Functions.js');
+const { CreateCanvasElement, GetTextFont, GetTextColor } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 let snapPointVector, grabbed = false;
 refObject.onSnapped.add((o, _2, point) => {
@@ -27,7 +27,8 @@ refObject.onHit.add(() => {
 const zPosition = 5.1;
 const widgetWidth = 400;
 const widgetHeight = 300;
-const nameFont = "Fallout.ttf";
+let nameFont = GetTextFont();
+let textColor = GetTextColor();
 //-----------------------------------------------------------------
 class MainIfo {
   constructor(parent, position) {
@@ -58,7 +59,7 @@ class MainIfo {
     this.incrementH.setImageSize(100);
     nC.addChild(this.incrementH, centerX + offsetX, centerY - offsetY, localSize, localSize);
     //-------------------------
-    this.fontTextH = new Text().setText("?").setTextColor(new Color(1, 0.25, 0.25)).setFont(nameFont);
+    this.fontTextH = new Text().setText("?").setTextColor(new Color(1, 0.3, 0.25)).setFont(nameFont);
     this.fontTextH.setFontSize(40);
     nC.addChild(this.fontTextH, centerX - 30, centerY - offsetY, 200, localSize);
     //-------------------------
@@ -85,7 +86,7 @@ class MainIfo {
     this.incrementA.setImageSize(100);
     nC.addChild(this.incrementA, centerX + offsetX, centerY + offsetY, localSize, localSize);
     //-------------------------
-    this.fontTextA = new Text().setText("?").setTextColor(new Color(0.25, 1, 0.25)).setFont(nameFont);
+    this.fontTextA = new Text().setText("?").setTextColor(new Color(0.3, 1, 0.25)).setFont(nameFont);
     this.fontTextA.setFontSize(40);
     nC.addChild(this.fontTextA, centerX - 15, centerY + offsetY, 100, localSize);
     //-------------------------
@@ -100,15 +101,15 @@ class MainIfo {
       }
     });
     //-------------------------
-    this.spendText = new Text().setText("Spend action point on the move").setFontSize(18).setTextColor(new Color(1, 0, 0));
+    this.spendText = new Text().setText("Spend action point on the move").setFontSize(18).setTextColor(new Color(1, 0.1, 0));
     nC.addChild(this.spendText, widgetWidth / 2 - 180, widgetHeight - 80, 380, localSize);
     this.spendActionPoint = new Slider().setTextBoxWidth(0).setMaxValue(1).setMinValue(0).setStepSize(1);
     nC.addChild(this.spendActionPoint, widgetWidth / 2 - 150, widgetHeight - 60, 300, localSize);
     this.spendActionPoint.onValueChanged.add((_1, _2, value) => {
       if (value) {
-        t.spendText.setTextColor(new Color(0, 1, 0));
+        t.spendText.setTextColor(new Color(0.25, 1, 0));
       } else {
-        t.spendText.setTextColor(new Color(1, 0, 0));
+        t.spendText.setTextColor(new Color(1, 0.1, 0));
       }
     })
   }

@@ -1,5 +1,5 @@
 ﻿const { refObject, world } = require('@tabletop-playground/api');
-const { ChangeImageSlider, PositionsFontUI, SetCurrentLevel, CreateCanvasElement } = require('./general/General_Functions.js');
+const { ChangeImageSlider, PositionsFontUI, SetCurrentLevel, CreateCanvasElement, GetTextFont, GetTextColor } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   loadState();
@@ -8,7 +8,8 @@ refObject.onCreated.add(() => {
 const zPosition = 0.05;
 const widgetWidth = 1600;
 const widgetHeight = 400;
-const nameFont = "Fallout.ttf";
+let nameFont = GetTextFont();
+let textColor = GetTextColor();
 let nCUI = CreateCanvasElement(null, new Vector(0, 0, zPosition), widgetWidth, widgetHeight);
 //-----------------------------------------------------------------
 class LevelBox {
@@ -23,7 +24,7 @@ class LevelBox {
     nCUI.widget = nC;
     parent.attachUI(nCUI);
     //-------------------------
-    this.changedButton = new Button().setText("1").setFont(nameFont);
+    this.changedButton = new Button().setText("1").setFont(nameFont).setTextColor(textColor);
     this.changedButton.setFontSize(40);
     nC.addChild(this.changedButton, 440, 145, 100, 80);
     //-------------------------
@@ -53,7 +54,7 @@ class LevelBox {
     this.back = new ImageWidget().setImage("bar1.png");
     nC.addChild(this.back, 100, 310, 1400, 80);
     //-------------------------
-    this.fontText = new Text().setText(this.Ex + "/" + this.maxEx).setFont(nameFont);
+    this.fontText = new Text().setText(this.Ex + "/" + this.maxEx).setFont(nameFont).setTextColor(textColor);
     this.fontText.setFontSize(18);
 
     let posB = position.add(new Vector(0, 3, -0.01));
@@ -83,7 +84,7 @@ class LevelBox {
       if (!t.firstTime) saveState(); else t.firstTime = false;
     });
     //--Level-----------------------
-    this.textLevel = new Text().setText("1").setFont(nameFont).setEnabled(false);
+    this.textLevel = new Text().setText("1").setFont(nameFont).setEnabled(false).setTextColor(textColor);
     this.textLevel.setFontSize(50);
     nC.addChild(this.textLevel, 460, 50, 100, 80);
     //-------------------------
@@ -159,7 +160,7 @@ function saveState() {
   let state = {};
 
   state["level"] = infoLevel.valueLevel;
-  state["experience"] = infoLevel.experience;
+  state["experience"] = infoLevel.valueExperience;
 
   refObject.setSavedData(JSON.stringify(state));
 }
@@ -172,6 +173,6 @@ function loadState() {
 
   let state = JSON.parse(refObject.getSavedData());
 
-  infoLevel.valueLevel = state["level"];
+  infoLevel.valueLevel = state["level"] || 1;
   infoLevel.valueExperience = state["experience"];
 }
