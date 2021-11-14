@@ -9,7 +9,7 @@ refObject.onCreated.add(() => {
     let checkInfo = false;
     for (let i = 0; i < allObject.length; i++) {
       if (refObject != allObject[i] && refObject.getName() == allObject[i].getName()) {
-        if (allObject[i].getTemplateName() == "Figure") {
+        if (allObject[i].getTemplateMetadata() == "firgureCharacter") {
           figurePlate = allObject[i];
           figurePlate.SetHelthPlate(helthPoint, actionPoint);
         } else if (allObject[i].SetHealthActionPlate) {
@@ -155,6 +155,7 @@ class ActionPoints {
   inactiveActions = [];
   positionsActionX = [];
   constructor(parent, position) {
+    let t = this;
     let offsetVec = new Vector(0.55, 3, 0);
     this.parent = parent;
     this.quantityAction = 7;
@@ -201,7 +202,6 @@ class ActionPoints {
     this.increment.setImageSize(100);
     nC.addChild(this.increment, 1490, 90, 60, 60);
     //-------------------------
-    let t = this;
     let boxTable = [1, 2, 4];
     let boxIndex = 0;
     this.changedButton.onClicked.add(function () {
