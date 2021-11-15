@@ -1,34 +1,58 @@
 const { refObject } = require('@tabletop-playground/api');
-const { AddValueMain } = require('./general/General_Functions.js');
+const { AddValueMain, AddConditionMain, ConditionCheck } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
+let figurePlate;
 refObject.onCreated.add(() => {
   loadState();
+  setTimeout(() => {
+    let allObject = world.getAllObjects();
+    for (let i = 0; i < allObject.length; i++) {
+      if (refObject != allObject[i] && refObject.getName() == allObject[i].getName()) {
+        if (allObject[i].getTemplateMetadata() == "firgureCharacter") {
+          figurePlate = allObject[i];
+          break;
+        }
+      }
+    }
+  }, 200);
 })
 //-----------------------------------------------------------------
-refObject.ChangeValues = (description, itemGrab) => {
+refObject.ChangeValues = (name, description, grab) => {
+  figurePlate.ChangeNamesBonus(name, grab);
+
+  itemGrab = grab;
   let brokenDescription = description.split(/\s?\n/);
   for (let j = 0; j < arrayCharacteristic.length; j++) {
     for (let i = 0; i < brokenDescription.length; i++) {
-      if (brokenDescription[i].toLowerCase().includes(arrayCharacteristic[j])) {
-        let value = parseInt(brokenDescription[i].slice(arrayCharacteristic[j].length + 1)) * (!itemGrab && 1);
-        AddValueMain(refObject.getName(), j, value, "characteristic");
-      }
+      AddValues(brokenDescription[i].toLowerCase(), j, "characteristic", arrayCharacteristic[j]);
     }
   }
   for (let j = 0; j < arraySkills.length; j++) {
     for (let i = 0; i < brokenDescription.length; i++) {
-      if (brokenDescription[i].toLowerCase().includes(arraySkills[j])) {
-        let value = parseInt(brokenDescription[i].slice(arraySkills[j].length + 1)) * (!itemGrab && 1);
-        AddValueMain(refObject.getName(), j, value, "skills");
-      }
+      AddValues(brokenDescription[i].toLowerCase(), j, "skills", arraySkills[j]);
     }
   }
   for (let j = 0; j < arrayStatus.length; j++) {
     for (let i = 0; i < brokenDescription.length; i++) {
-      if (brokenDescription[i].toLowerCase().includes(arrayStatus[j])) {
-        let value = parseInt(brokenDescription[i].slice(arrayStatus[j].length + 1)) * (!itemGrab && 1);
-        AddValueMain(refObject.getName(), j, value, "status");
+      AddValues(brokenDescription[i].toLowerCase(), j, "status", arrayStatus[j]);
+    }
+  }
+}
+
+let itemGrab = true;
+function AddValues(iLooking, j, type, wLooking) {
+  if (iLooking.includes(wLooking)) {
+    let condition = ConditionCheck(iLooking);
+    if (condition) {
+      for (let i = 0; i < arrayXvalue.length; i++) {
+        if (iLooking.includes(arrayXvalue[i])) {
+          let textCondition = !itemGrab && iLooking.slice(wLooking.length + 1) || "";
+          AddConditionMain(refObject.getName(), j, textCondition, type);
+        }
       }
+    } else {
+      let value = parseInt(iLooking.slice(wLooking.length + 1)) * (!itemGrab && 1);
+      AddValueMain(refObject.getName(), j, value, type);
     }
   }
 }
@@ -38,6 +62,7 @@ refObject.ResetValue = function () { }
 let arrayCharacteristic = [];
 let arraySkills = [];
 let arrayStatus = [];
+let arrayXvalue = [];
 function loadState() {
   arrayCharacteristic.push("strength:");
   arrayCharacteristic.push("perception:");
@@ -75,4 +100,7 @@ function loadState() {
   arraySkills.push("eloquence:");
   arraySkills.push("barter:");
   arraySkills.push("gambling:");
+  //-------------------------
+  arrayXvalue.push("health");
+  arrayXvalue.push("action");
 }

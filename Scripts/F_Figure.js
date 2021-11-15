@@ -58,7 +58,7 @@ class MainInfo {
     this.incrementH.setImageSize(100);
     nC.addChild(this.incrementH, centerX + offsetX, centerY - offsetY, localSize, localSize);
     //-------------------------
-    this.fontTextH = new Text().setText((mainValues["health"] + "/" + mainValues["healthMax"]) || "?").setTextColor(new Color(1, 0.3, 0.25)).setFont(nameFont);
+    this.fontTextH = new Text().setText(mainValues && (mainValues["health"] + "/" + mainValues["healthMax"]) || "?").setTextColor(new Color(1, 0.3, 0.25)).setFont(nameFont);
     this.fontTextH.setFontSize(40);
     nC.addChild(this.fontTextH, centerX - 30, centerY - offsetY, 160, localSize);
     //-------------------------
@@ -70,7 +70,7 @@ class MainInfo {
     this.incrementA.setImageSize(100);
     nC.addChild(this.incrementA, centerX + offsetX, centerY + offsetY, localSize, localSize);
     //-------------------------
-    this.fontTextA = new Text().setText((mainValues["action"] + "/" + mainValues["actionMax"]) || "?").setTextColor(new Color(0.3, 1, 0.25)).setFont(nameFont);
+    this.fontTextA = new Text().setText(mainValues && (mainValues["action"] + "/" + mainValues["actionMax"]) || "?").setTextColor(new Color(0.3, 1, 0.25)).setFont(nameFont);
     this.fontTextA.setFontSize(40);
     nC.addChild(this.fontTextA, centerX - 15, centerY + offsetY, 100, localSize);
     //-------------------------
@@ -131,12 +131,19 @@ class MainInfo {
         }
       });
     }
-    //--Settings-----------------------
+    //--Settings--Bonus---------------------
     if (isNPC) {
       let gear = new ImageButton().setImage("gear-icon.png");
       nC.addChild(gear, widgetWidth - 50, 0, 50, 50);
       gear.onClicked.add(() => {
         settings.ShowUI();
+        t.HideUI();
+      })
+    } else {
+      let gear = new ImageButton().setImage("info-icon.png");
+      nC.addChild(gear, widgetWidth - 50, 0, 50, 50);
+      gear.onClicked.add(() => {
+        bonusInfo.ShowUI();
         t.HideUI();
       })
     }
@@ -163,7 +170,7 @@ class MainInfo {
   }
 
   HideUI() {
-    this.nCUI.scale = 0;
+    this.nCUI.scale = 0.01;
     this.nCUI.position = this.startPosition.add(new Vector(-0.1, 0, 0));
     this.parent.updateUI(this.nCUI);
   }
@@ -186,7 +193,7 @@ class Settings {
     //-------------------------
     let nC = new Canvas();
     this.nCUI = CreateCanvasElement(nC, position.add(new Vector(-0.7, 0, 0.45)), widgetWidth, widgetHeight);
-    this.nCUI.scale = 0;
+    this.nCUI.scale = 0.01;
     this.nCUI.rotation = new Rotator(-65, 0, 180);
     parent.attachUI(this.nCUI);
     //-------------------------
@@ -246,9 +253,9 @@ class Settings {
       this.changedValueAction.setText(boxTableA[boxIndexA]);
     })
     //-------------------------
-    let gear = new ImageButton().setImage("cross-icon.png");
-    nC.addChild(gear, widgetWidth - 50, 0, 50, 50);
-    gear.onClicked.add(() => {
+    let cross = new ImageButton().setImage("cross-icon.png");
+    nC.addChild(cross, widgetWidth - 50, 0, 50, 50);
+    cross.onClicked.add(() => {
       mainInfo.ShowUI();
       t.HideUI();
     })
@@ -261,7 +268,57 @@ class Settings {
   set ChangedValueAction(number) { this.changedValueAction.setText(number); }
 
   HideUI() {
-    this.nCUI.scale = 0;
+    this.nCUI.scale = 0.01;
+    this.nCUI.position = this.startPosition.add(new Vector(-0.1, 0, 0));
+    this.parent.updateUI(this.nCUI);
+  }
+  ShowUI() {
+    this.nCUI.scale = 0.1;
+    this.nCUI.position = this.startPosition.add(new Vector(0.1, 0, 0));
+    this.parent.updateUI(this.nCUI);
+  }
+}
+
+class BonusInfo {
+  constructor(parent, position) {
+    let t = this;
+    this.startPosition = position.add(new Vector(-0.7, 0, 0.45));
+    this.parent = parent;
+    //-------------------------
+    let nC = new Canvas();
+    this.nCUI = CreateCanvasElement(nC, position.add(new Vector(-0.7, 0, 0.45)), widgetWidth, widgetHeight);
+    this.nCUI.scale = 0.01;
+    this.nCUI.rotation = new Rotator(-65, 0, 180);
+    parent.attachUI(this.nCUI);
+    //-------------------------
+    let borderMain = new ImageWidget().setImage("brosok.png");
+    borderMain.scale = 0.1;
+    nC.addChild(borderMain, 0, offsetPlateY / 2, widgetWidth, widgetHeight - offsetPlateY);
+    //-------------------------
+    this.information = new MultilineTextBox().setTextColor(textColor).setFont(nameFont).setEnabled(false);
+    this.information.setFontSize(40).setBackgroundTransparent(true);
+    nC.addChild(this.information, 0, offsetPlateY / 2 + 2, widgetWidth, widgetHeight - offsetPlateY);
+    //-------------------------
+    let cross = new ImageButton().setImage("cross-icon.png");
+    nC.addChild(cross, widgetWidth - 50, 0, 50, 50);
+    cross.onClicked.add(() => {
+      mainInfo.ShowUI();
+      t.HideUI();
+    })
+  }
+
+  SetNamesBonus() {
+    let newText = "";
+    for (let i = 0; i < bonuses.length; i++) {
+      if (bonuses[i] != "")
+        newText += bonuses[i] + "\n";
+    }
+    this.information.setText(newText);
+    this.parent.updateUI(this.nCUI);
+  }
+
+  HideUI() {
+    this.nCUI.scale = 0.01;
     this.nCUI.position = this.startPosition.add(new Vector(-0.1, 0, 0));
     this.parent.updateUI(this.nCUI);
   }
@@ -284,27 +341,57 @@ refObject.SetHelthPlate = (plate1, plate2) => {
 
 refObject.SetValueH = (value) => { mainInfo.fontTextH.setText(value); }
 refObject.SetValueA = (value) => { mainInfo.fontTextA.setText(value); }
+
+let bonuses = [];
+refObject.ChangeNamesBonus = (name, grab) => {
+  if (grab) {
+    for (let i = 0; i < bonuses.length; i++) {
+      if (bonuses[i] == name) {
+        bonuses[i] = "";
+        break;
+      }
+    }
+  } else {
+    let flag;
+    for (let i = 0; i < bonuses.length; i++) {
+      if (bonuses[i] == "") {
+        bonuses[i] = name;
+        flag = true;
+        break;
+      }
+    }
+    if (!flag) {
+      bonuses.push(name);
+    }
+  }
+  bonusInfo.SetNamesBonus();
+  saveState();
+}
 //-----------------------------------------------------------------
-let mainInfo, settings;
+let mainInfo, settings, bonusInfo;
 let mainValues = [];
 if (refObject.getTemplateMetadata() == "firgureNPC") {
   mainValues["health"] = "0"; mainValues["healthMax"] = "5";
   mainValues["action"] = "0"; mainValues["actionMax"] = "5";
   mainInfo = new MainInfo(refObject, new Vector(0, 0, zPosition), true);
-  settings = new Settings(refObject, new Vector(0, 0, zPosition));
   loadState();
+  settings = new Settings(refObject, new Vector(0, 0, zPosition));
 } else if (refObject.getTemplateMetadata() == "firgureCharacter") {
   mainInfo = new MainInfo(refObject, new Vector(0, 0, zPosition));
+  bonusInfo = new BonusInfo(refObject, new Vector(0, 0, zPosition));
+  loadState();
+  bonusInfo.SetNamesBonus();
 }
 //-----------------------------------------------------------------
 function saveState() {
   let state = {};
   
+  state["bonuses"] = bonuses;
   state["healthMax"] = mainValues["healthMax"];
   state["actionMax"] = mainValues["actionMax"];
   state["health"] = mainInfo.HealthValue;
   state["action"] = mainInfo.ActionValue;
-
+  
   refObject.setSavedData(JSON.stringify(state));
 }
 
@@ -315,7 +402,8 @@ function loadState() {
   }
 
   let state = JSON.parse(refObject.getSavedData());
-  
+
+  bonuses = state["bonuses"];
   mainValues["healthMax"] = state["healthMax"];
   mainValues["actionMax"] = state["actionMax"];
   mainInfo.HealthValue = state["health"];

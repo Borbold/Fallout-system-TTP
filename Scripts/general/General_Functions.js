@@ -66,6 +66,18 @@ function AddValueMain(name, nameValue, value, type) {
   }
 }
 module.exports.AddValueMain = AddValueMain;
+
+function AddConditionMain(name, nameValue, condition, type) {
+  for (let i = 0; i < ids.length; i++) {
+    if (idObjects[name + ids[i]]) {
+      let o = world.getObjectById(idObjects[name + ids[i]]);
+      if (o.getTemplateMetadata() == type) {
+        o.ConditionMain(nameValue, condition);
+      }
+    }
+  }
+}
+module.exports.AddConditionMain = AddConditionMain;
 //-----------------------------------------------------------------
 const TypeCharacteristic = {
   strenght: 0,
@@ -123,3 +135,61 @@ function GetTextColor() {
   return new Color(1, 0.71, 0.25);
 }
 module.exports.GetTextColor = GetTextColor;
+//-----------------------------------------------------------------
+function CalculateConditionValue(conditionValueMain, plate, wordCheck) {
+  let conditionMain = 0;
+  let condition = ConditionCheck(conditionValueMain);
+  if (condition) {
+    let brokenCondition = conditionValueMain.split(" ");
+    if (brokenCondition[0] == wordCheck) {
+      if (brokenCondition[2].includes("%")) {
+        let checkValue = parseInt(brokenCondition[2].slice(0, brokenCondition[2].length - 1));
+        if (ConditionValue(plate.GetProcent(), checkValue, condition)) {
+          conditionMain += parseInt(brokenCondition[brokenCondition.length - 1]);
+        }
+      } else {
+        let checkValue = parseInt(brokenCondition[2]);
+        if (ConditionValue(plate.value, checkValue, condition)) {
+          conditionMain += parseInt(brokenCondition[brokenCondition.length - 1]);
+        }
+      }
+    }
+  }
+  return conditionMain;
+}
+module.exports.CalculateConditionValue = CalculateConditionValue;
+
+function ConditionCheck(iLooking) {
+  let condition;
+  if (iLooking.includes("<")) {
+    condition = "<";
+  } else if (iLooking.includes(">")) {
+    condition = ">";
+  } else if (iLooking.includes("<=")) {
+    condition = "<=";
+  } else if (iLooking.includes(">=")) {
+    condition = ">=";
+  } else if (iLooking.includes("==")) {
+    condition = "==";
+  } else if (iLooking.includes("!+")) {
+    condition = "!=";
+  }
+  return condition
+}
+module.exports.ConditionCheck = ConditionCheck;
+
+function ConditionValue(value, checkValue, condition) {
+  if (condition == "<") {
+    return value < checkValue;
+  } else if (condition == ">") {
+    return value > checkValue;
+  } else if (condition == "<=") {
+    return value <= checkValue;
+  } else if (condition == ">=") {
+    return value >= checkValue;
+  } else if (condition == "==") {
+    return value == checkValue;
+  } else if (condition == "!=") {
+    return value != checkValue;
+  }
+}

@@ -1,5 +1,6 @@
 const { refObject } = require('@tabletop-playground/api');
-const { SetValueChars, TypeCharacteristic, SetFreePoints, SetIdObject, CreateCanvasElement, GetCurrentLevel, GetTextFont, GetTextColor } = require('./general/General_Functions.js');
+const { SetValueChars, TypeCharacteristic, SetFreePoints, SetIdObject, CreateCanvasElement,
+  GetCurrentLevel, GetTextFont, GetTextColor, CalculateConditionValue } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   SetIdObject(refObject.getName(), refObject.getId());
@@ -45,7 +46,7 @@ let majorCharacteristics = [], valueMajorC = [];
 let baffCharacteristics = [], valueBaffC = [];
 let debaffCharacteristics = [], valueDebaffC = [];
 let mainCharacteristics = [], valueMainC = [];
-let additionValueMain = [];
+let additionValueMain = [], conditionValueMain = [];
 for (let i = 0; i < countChar; i++) {
   valueMajorC[i] = 5;
   majorCharacteristics[i] = new TextBox().setFont(nameFont).setEnabled(false).setTextColor(textColor);
@@ -57,10 +58,9 @@ for (let i = 0; i < countChar; i++) {
     } else if (i == TypeCharacteristic.strenght || i == TypeCharacteristic.endurance) {
       healthPlate.SetMaxValue(valueMajorC[TypeCharacteristic.strenght], valueMajorC[TypeCharacteristic.endurance], GetCurrentLevel());
     } else if (i == TypeCharacteristic.dextery) {
-      actionPlate.SetMaxValue(valueMajorC[TypeCharacteristic.strenght]);
+      actionPlate.SetMaxValue(valueMajorC[TypeCharacteristic.dextery]);
     }
     SetValueChars(refObject.getName(), valueMajorC);
-    saveState();
   })
   //--
   valueBaffC[i] = 0;
@@ -93,14 +93,18 @@ for (let i = 0; i < countChar; i++) {
   })
   //--
   additionValueMain[i] = 0;
+  conditionValueMain[i] = "";
 }
 
 function RecalculationMajorCharacteristic(index) {
-  let main = additionValueMain[index] + parseInt(mainCharacteristics[index].getText());
+  let conditionMain = CalculateConditionValue(conditionValueMain[index], healthPlate, "health");
+
+  let main = additionValueMain[index] + parseInt(mainCharacteristics[index].getText()) + conditionMain;
   let debaff = parseInt(debaffCharacteristics[index].getText());
   let baff = parseInt(baffCharacteristics[index].getText());
   valueMajorC[index] = main + baff - debaff;
   majorCharacteristics[index].setText(main + baff - debaff);
+  saveState();
 }
 
 function CreateCharacteristicTextBox(parent, index, position, typeChar) {
@@ -306,6 +310,7 @@ function saveState() {
   state["Debaff"] = valueDebaffC;
   state["Main"] = valueMainC;
   state["addition"] = additionValueMain;
+  state["condition"] = conditionValueMain;
   state["reputation"] = reputationValues;
 
   refObject.setSavedData(JSON.stringify(state));
@@ -327,13 +332,8 @@ function loadState() {
   valueBaffC = state["Baff"] || valueBaffC;
   valueDebaffC = state["Debaff"] || valueDebaffC;
   valueMainC = state["Main"] || valueMainC;
-  if (!state["addition"] && state["addition"].length == countChar) {
-    for (let i = 0; i < countChar; i++) {
-      additionValueMain[i] = 0;
-    }
-  } else {
-    additionValueMain = state["addition"];
-  }
+  additionValueMain = state["addition"] || additionValueMain;
+  conditionValueMain = state["condition"] || conditionValueMain;
   for (let i = 0; i < countChar; i++) {
     baffCharacteristics[i].setText(valueBaffC[i]);
     debaffCharacteristics[i].setText(valueDebaffC[i]);
@@ -366,12 +366,26 @@ refObject.AdditionMain = (index, value) => {
   RecalculationMajorCharacteristic(index);
 }
 
+refObject.ConditionMain = (index, condition) => {
+  conditionValueMain[index] = condition;
+  RecalculationMajorCharacteristic(index);
+}
+
 let healthPlate, actionPlate;
 refObject.SetHealthActionPlate = (plate1, plate2) => {
   healthPlate = plate1;
+  healthPlate.RecalculationMajor = () => {
+    for (let i = 0; i < conditionValueMain.length; i++) {
+      if (conditionValueMain[i].length > 0) {
+        RecalculationMajorCharacteristic(i);
+      }
+    }
+  }
   actionPlate = plate2;
 }
 
 refObject.ChangeMaxHealth = () => {
-  healthPlate.SetMaxValue(valueMajorC[TypeCharacteristic.strenght], valueMajorC[TypeCharacteristic.endurance], GetCurrentLevel());
+  setTimeout(() => {
+    healthPlate.SetMaxValue(valueMajorC[TypeCharacteristic.strenght], valueMajorC[TypeCharacteristic.endurance], GetCurrentLevel());
+  }, 210);
 }

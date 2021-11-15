@@ -1,5 +1,5 @@
 const { refObject } = require('@tabletop-playground/api');
-const { SetIdObject, TypeCharacteristic, CreateCanvasElement, GetTextFont, GetTextColor } = require('./general/General_Functions.js');
+const { SetIdObject, TypeCharacteristic, CreateCanvasElement, GetTextFont, GetTextColor, CalculateConditionValue } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   SetIdObject(refObject.getName(), refObject.getId());
@@ -18,7 +18,7 @@ let baffSkills = [], baffValues = [];
 let debaffSkills = [], debaffValues = [];
 let mainSkills = [], mainValues = [];
 let startValueMainSkills = [];
-let additionValueMain = [];
+let additionValueMain = [], conditionValueMain = [];
 for (let i = 0; i < countSkills; i++) {
   majorSkills[i] = new TextBox().setText("0").setEnabled(false).setFont(nameFont).setTextColor(textColor);
   majorSkills[i].setFontSize(40);
@@ -52,10 +52,14 @@ for (let i = 0; i < countSkills; i++) {
   //--
   startValueMainSkills[i] = 0;
   additionValueMain[i] = 0;
+  conditionValueMain[i] = "";
 }
 //-----------------
 function RecalculationMajorSkills(index) {
-  let main = additionValueMain[index] + startValueMainSkills[index] + parseInt(mainValues[index]) * (selectedSkills[index] && 2 || 1);
+  let conditionMain = 0;
+  //let conditionMain = CalculateConditionValue(conditionValueMain[index], "Какая то плашка");
+
+  let main = additionValueMain[index] + startValueMainSkills[index] + parseInt(mainValues[index]) * (selectedSkills[index] && 2 || 1) + conditionMain;
   let debaff = parseInt(debaffValues[index]);
   let baff = parseInt(baffValues[index]);
   majorSkills[index].setText(main + baff - debaff);
@@ -242,6 +246,7 @@ function saveState() {
   state["debaff"] = debaffValues;
   state["main"] = mainValues;
   state["addition"] = additionValueMain;
+  state["condition"] = conditionValueMain;
   state["selected"] = selectedSkills;
   state["countSelected"] = countSelected;
 
@@ -258,14 +263,10 @@ function loadState() {
   baffValues = state["baff"] || baffValues;
   debaffValues = state["debaff"] || debaffValues;
   mainValues = state["main"] || mainValues;
-  if (state["addition"] && state["addition"].length != 0) {
-    additionValueMain = state["addition"];
-  } else {
-    for (let i = 0; i < countSkills; i++) {
-      additionValueMain[i] = 0;
-    }
-  }
+  additionValueMain = state["addition"] || additionValueMain;
+  conditionValueMain = state["condition"] || conditionValueMain;
   selectedSkills = state["selected"] || selectedSkills;
+
   countSelected = state["countSelected"] || 0;
   for (let i = 0; i < countSkills; i++) {
     baffSkills[i].setText(baffValues[i] || "0");
@@ -320,6 +321,11 @@ refObject.SetFreeSkillPoint = (value) => {
   skillsMajor.freeSkillPoint.setText(value);
   skillsMajor.freeSPValue = value;
   skillsMajor.RecalculationFreePoints();
+}
+
+refObject.ConditionMain = (index, condition) => {
+  conditionValueMain[index] = condition;
+  RecalculationMajorSkills(index);
 }
 //-----------------------------------------------------------------
 loadState();

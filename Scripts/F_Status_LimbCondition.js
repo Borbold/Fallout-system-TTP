@@ -1,5 +1,5 @@
 const { refObject } = require('@tabletop-playground/api');
-const { SetIdObject, TypeCharacteristic, CreateCanvasElement, GetTextFont, GetTextColor } = require('./general/General_Functions.js');
+const { SetIdObject, TypeCharacteristic, CreateCanvasElement, GetTextFont, GetTextColor, CalculateConditionValue } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   SetIdObject(refObject.getName(), refObject.getId());
@@ -60,7 +60,7 @@ let baffStatus2 = [], baffStatusValue = [];
 let debaffStatus2 = [], debaffStatusValue = [];
 let mainStatus2 = [], mainStatusValue = [];
 let startValueMainStatus = [];
-let additionValueMain = [];
+let additionValueMain = [], conditionValueMain = [];
 for (let i = 0; i < countStatus2; i++) {
   majorStatus2[i] = new TextBox().setText("0").setEnabled(false).setFont(nameFont).setTextColor(textColor);
   majorStatus2[i].setFontSize(38);
@@ -98,10 +98,14 @@ for (let i = 0; i < countStatus2; i++) {
   //--
   startValueMainStatus[i] = 0;
   additionValueMain[i] = 0;
+  conditionValueMain[i] = "";
 }
 
 function RecalculationMajorStatus(index) {
-  let main = additionValueMain[index] + startValueMainStatus[index] + parseInt(mainStatus2[index].getText());
+  let conditionMain = 0;
+  //let conditionMain = CalculateConditionValue(conditionValueMain[index], "Какая то плашка");
+
+  let main = additionValueMain[index] + startValueMainStatus[index] + parseInt(mainStatus2[index].getText()) + conditionMain;
   let debaff = parseInt(debaffStatus2[index].getText());
   let baff = parseInt(baffStatus2[index].getText());
   majorStatus2[index].setText(main + baff - debaff);
@@ -312,6 +316,7 @@ function saveState() {
   state["limb"] = allLimbValue;
   state["Main"] = mainStatusValue;
   state["addition"] = additionValueMain;
+  state["condition"] = conditionValueMain;
   state["Baff"] = baffStatusValue;
   state["Debaff"] = debaffStatusValue;
 
@@ -336,13 +341,8 @@ function loadState() {
   mainStatusValue = state["Main"] || mainStatusValue;
   baffStatusValue = state["Baff"] || baffStatusValue;
   debaffStatusValue = state["Debaff"] || debaffStatusValue;
-  if (state["addition"] && state["addition"].length != 0) {
-    additionValueMain = state["addition"];
-  } else {
-    for (let i = 0; i < countStatus2; i++) {
-      additionValueMain[i] = 0;
-    }
-  }
+  additionValueMain = state["addition"] || additionValueMain;
+  conditionValueMain = state["condition"] || conditionValueMain;
   for (let i = 0; i < countStatus2; i++) {
     let index = i;
     mainStatus2[index].setText(mainStatusValue[i] || "0");
@@ -379,5 +379,10 @@ refObject.RecalculationMain = (array) => {
 
 refObject.AdditionMain = (index, value) => {
   additionValueMain[index] = value;
+  RecalculationMajorStatus(index);
+}
+
+refObject.ConditionMain = (index, condition) => {
+  conditionValueMain[index] = condition;
   RecalculationMajorStatus(index);
 }

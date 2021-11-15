@@ -13,6 +13,7 @@ refObject.onCreated.add(() => {
           figurePlate = allObject[i];
           figurePlate.SetHelthPlate(helthPoint, actionPoint);
         } else if (allObject[i].SetHealthActionPlate) {
+          //Info_Reputation
           allObject[i].SetHealthActionPlate(helthPoint, actionPoint);
           checkInfo = true;
         }
@@ -34,6 +35,7 @@ class HelthPoints {
   firstTime = true;
   startImageSliderPosX = 3.3;
   constructor(parent, position) {
+    let t = this;
     let offsetX = -1.31;
     this.parent = parent;
     this.helthValue = 30;
@@ -81,7 +83,6 @@ class HelthPoints {
     fountTextUI.scale = 0.2;
     parent.attachUI(fountTextUI);
     //-------------------------
-    let t = this;
     let boxTable = [1, 5, 10, 25, 50, 100];
     let boxIndex = 0;
     this.changedButton.onClicked.add(function () {
@@ -119,6 +120,8 @@ class HelthPoints {
     if (!this.firstTime) saveState(); else this.firstTime = false;
     this.backText.setText(number + "/" + this.maxHelthValue + " max");
     figurePlate.SetValueH(number + "/" + this.maxHelthValue);
+    //Info_Reputation
+    if (this.RecalculationMajor) { this.RecalculationMajor(); }
   }
 
   get changedValue() { return parseInt(this.changedButton.getText()); }
@@ -143,9 +146,9 @@ class HelthPoints {
       this.backText.setText(this.value + "/" + newMax + " max");
     }
   }
-  set maxValue(value) {
-    this.maxHelthValue = value;
-  }
+  set MaxValue(value) { this.maxHelthValue = value; }
+
+  GetProcent() { return (this.value * 100) / this.maxHelthValue; }
 }
 let helthPoint = new HelthPoints(refObject, new Vector(0, 0, zPosition));
 
@@ -260,9 +263,9 @@ class ActionPoints {
       this.backText.setText(this.value + "/" + this.maxAction + " max");
     }
   }
-  set maxValue(value) {
-    this.maxAction = value;
-  }
+  set MaxValue(value) { this.maxAction = value; }
+
+  GetProcent() { return (this.value * 100) / this.maxAction; }
 
   get changedValue() { return parseInt(this.changedButton.getText()); }
   set changedValue(number) { this.changedButton.setText(number.toString()); }
@@ -295,7 +298,7 @@ function loadState() {
 refObject.ResetValue = function () {
   helthPoint.value = 30;
   actionPoint.value = 7;
-  helthPoint.maxValue = 30;
-  actionPoint.maxValue = 7;
+  helthPoint.MaxValue = 30;
+  actionPoint.MaxValue = 7;
   saveState();
 }
