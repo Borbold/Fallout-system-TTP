@@ -212,14 +212,20 @@ class Status2 {
     parent.attachUI(this.nCUI);
     //-------------------------
     let borderBaff = new Border();
+    //Временная затычка!!! После фикса убрать
+    borderBaff.setChild(new Text());
     borderBaff.setColor(new Color(0.05, 0, 1));
     nC.addChild(borderBaff, 250, 100, 40, 40);
     //-------------------------
     let borderDebaff = new Border();
+    //Временная затычка!!! После фикса убрать
+    borderDebaff.setChild(new Text());
     borderDebaff.setColor(new Color(1, 0, 0.05));
     nC.addChild(borderDebaff, 380, 100, 40, 40);
     //-------------------------
     let borderMain = new Border();
+    //Временная затычка!!! После фикса убрать
+    borderMain.setChild(new Text());
     borderMain.setColor(new Color(0.05, 1, 0.05));
     nC.addChild(borderMain, 510, 100, 40, 40);
     //-------------------------

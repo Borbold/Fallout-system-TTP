@@ -7,7 +7,7 @@ refObject.onSnapped.add((o, _2, point) => {
     let vectorO = new Vector(o.getPosition().x, o.getPosition().y, 0);
     let distanceMove = parseInt(vectorO.distance(snapPointVector));
     if (distanceMove > 0 && mainInfo.spendActionPoint.getValue()) {
-      mainInfo.DecrementActionPoints(1);
+      mainInfo.DecrementActionPoints(Math.round(distanceMove / 4));
     }
     grabbed = false;
   }
@@ -33,6 +33,7 @@ let textColor = GetTextColor();
 //-----------------------------------------------------------------
 class MainInfo {
   constructor(parent, position, isNPC) {
+    this.isNPC = isNPC;
     let t = this;
     this.startPosition = position.add(new Vector(-0.7, 0, 0.45));
     this.parent = parent;
@@ -88,8 +89,7 @@ class MainInfo {
     //-------------------------
     if (isNPC) {
       this.decrementH.onClicked.add(function () {
-        t.HealthValue -= settings.ChangedValueHealth;
-        t.HealthValue = t.HealthValue > 0 && t.HealthValue || "0";
+        t.HealthValue = t.HealthValue - settings.ChangedValueHealth > 0 && t.HealthValue - settings.ChangedValueHealth || "0";
       });
       this.incrementH.onClicked.add(function () {
         t.HealthValue += settings.ChangedValueHealth;
@@ -97,8 +97,7 @@ class MainInfo {
       });
       //-------------------------
       this.decrementA.onClicked.add(function () {
-        t.ActionValue -= settings.ChangedValueAction;
-        t.ActionValue = t.ActionValue > 0 && t.ActionValue || "0";
+        t.ActionValue = t.ActionValue - settings.ChangedValueAction > 0 && t.ActionValue - settings.ChangedValueAction || "0";
       });
       this.incrementA.onClicked.add(function () {
         t.ActionValue += settings.ChangedValueAction;
@@ -150,10 +149,14 @@ class MainInfo {
   }
 
   DecrementActionPoints(changedValue) {
-    if (actionPlate.quantityAction - changedValue < 0) {
-      actionPlate.value = 0;
+    if (this.isNPC) {
+      this.ActionValue = this.ActionValue - settings.ChangedValueAction > 0 && this.ActionValue - changedValue || "0";
     } else {
-      actionPlate.value = actionPlate.quantityAction - changedValue;
+      if (actionPlate.quantityAction - changedValue < 0) {
+        actionPlate.value = 0;
+      } else {
+        actionPlate.value = actionPlate.quantityAction - changedValue;
+      }
     }
   }
 
@@ -227,7 +230,7 @@ class Settings {
       this.changedValueHealth.setText(boxTableH[boxIndexH]);
     })
     //-------------------------
-    let maxAction = new TextBox().setText(mainValues["healthMax"]).setTextColor(new Color(0.3, 1, 0.25)).setFont(nameFont);
+    let maxAction = new TextBox().setText(mainValues["actionMax"]).setTextColor(new Color(0.3, 1, 0.25)).setFont(nameFont);
     maxAction.setFontSize(40);
     nC.addChild(maxAction, centerX, centerY + offsetY, 100, localSize);
     maxAction.onTextCommitted.add((_1, _2, text) => {

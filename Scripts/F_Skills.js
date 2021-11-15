@@ -135,6 +135,8 @@ class SkillsMajor {
     nC.addChild(this.freeSkillPoint, 775, 870, 170, 90);
     //-------------------------
     let borderMain = new Border();
+    //Временная затычка!!! После фикса убрать
+    borderMain.setChild(new Text());
     borderMain.setColor(new Color(0.05, 1, 0.05));
     nC.addChild(borderMain, 650, 100, 40, 40);
     nC.addChild(borderMain, 1380, 100, 40, 40);
@@ -208,11 +210,15 @@ class SkillsChanger {
     }
     //-------------------------
     let borderBaff = new Border();
+    //Временная затычка!!! После фикса убрать
+    borderBaff.setChild(new Text());
     borderBaff.setColor(new Color(0.05, 0, 1));
     nC.addChild(borderBaff, 520, 100, 40, 40);
     nC.addChild(borderBaff, 1250, 100, 40, 40);
     //-------------------------
     let borderDebaff = new Border();
+    //Временная затычка!!! После фикса убрать
+    borderDebaff.setChild(new Text());
     borderDebaff.setColor(new Color(1, 0, 0.05));
     nC.addChild(borderDebaff, 730, 100, 40, 40);
     nC.addChild(borderDebaff, 1460, 100, 40, 40);
