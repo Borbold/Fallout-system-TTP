@@ -28,8 +28,8 @@ const zPosition = 5.1;
 const widgetWidth = 400;
 const offsetPlateY = 100;
 const widgetHeight = 300 + offsetPlateY;
-let nameFont = GetTextFont();
-let textColor = GetTextColor();
+const nameFont = GetTextFont();
+const textColor = GetTextColor();
 //-----------------------------------------------------------------
 class MainInfo {
   constructor(parent, position, isNPC) {
@@ -139,9 +139,9 @@ class MainInfo {
         t.HideUI();
       })
     } else {
-      let gear = new ImageButton().setImage("info-icon.png");
-      nC.addChild(gear, widgetWidth - 50, 0, 50, 50);
-      gear.onClicked.add(() => {
+      let info = new ImageButton().setImage("info-icon.png");
+      nC.addChild(info, widgetWidth - 50, 0, 50, 50);
+      info.onClicked.add(() => {
         bonusInfo.ShowUI();
         t.HideUI();
       })
@@ -346,8 +346,8 @@ refObject.SetValueH = (value) => { mainInfo.fontTextH.setText(value); }
 refObject.SetValueA = (value) => { mainInfo.fontTextA.setText(value); }
 
 let bonuses = [];
-refObject.ChangeNamesBonus = (name, grab) => {
-  if (grab) {
+refObject.ChangeNameBonus = (name, remove) => {
+  if (remove) {
     for (let i = 0; i < bonuses.length; i++) {
       if (bonuses[i] == name) {
         bonuses[i] = "";

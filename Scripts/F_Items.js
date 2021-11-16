@@ -6,18 +6,32 @@ refObject.onCreated.add(() => {
 
 let snapingObjectId;
 refObject.onSnapped.add((o, _2, snapPoint) => {
-  let snapingObject = snapPoint.getParentObject();
-  snapingObject.ChangeValues(o.getName(), o.getDescription().toLowerCase());
-  snapingObjectId = snapingObject.getId();
-  saveState();
+  if (snapPoint.snapsRotation()) {
+    let snapingObject = snapPoint.getParentObject();
+    if (snapingObject.ChangeValues) {
+      snapingObject.ChangeValues(o.getName(), o.getDescription().toLowerCase());
+      snapingObjectId = snapingObject.getId();
+      saveState();
+    } else if (snapingObject.ChangeDispersedItems) {
+      snapingObject.ChangeDispersedItems(o);
+      snapingObjectId = snapingObject.getId();
+      saveState();
+    }
+  }
 })
 
 refObject.onGrab.add((o) => {
   if (snapingObjectId) {
     let snapingObject = world.getObjectById(snapingObjectId);
-    snapingObject.ChangeValues(o.getName(), o.getDescription().toLowerCase(), true);
-    snapingObjectId = 0;
-    saveState();
+    if (snapingObject.ChangeValues) {
+      snapingObject.ChangeValues(o.getName(), o.getDescription().toLowerCase(), true);
+      snapingObjectId = 0;
+      saveState();
+    } else if (snapingObject.ChangeDispersedItems) {
+      snapingObject.ChangeDispersedItems(o, true);
+      snapingObjectId = 0;
+      saveState();
+    }
   }
 })
 //-----------------------------------------------------------------

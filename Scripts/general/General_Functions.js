@@ -7,42 +7,35 @@ function SetIdObject(name, id) {
 }
 module.exports.SetIdObject = SetIdObject;
 
-function SetValueChars(name, array) {
-  for (let i = 0; i < ids.length; i++) {
-    if (idObjects[name + ids[i]]) {
-      let o = world.getObjectById(idObjects[name + ids[i]]);
-      if (o.RecalculationMain)
-        o.RecalculationMain(array);
+function GetObjectById(name) {
+  for (const id of ids) {
+    if (idObjects[name + id]) {
+      return world.getObjectById(idObjects[name + id]);
     }
   }
+}
+
+function SetValueChars(name, array) {
+  let o = GetObjectById(name);
+  if (o && o.RecalculationMain)
+    o.RecalculationMain(array);
 }
 module.exports.SetValueChars = SetValueChars;
 //-----------------------------------------------------------------
 let currentLevel = 1, currentFreePoints = 0;
 function SetFreePoints(name, value) {
   currentFreePoints = value;
-  for (let i = 0; i < ids.length; i++) {
-    if (idObjects[name + ids[i]]) {
-      let o = world.getObjectById(idObjects[name + ids[i]]);
-      if (o.SetFreeSkillPoint) {
-        o.SetFreeSkillPoint(value * currentLevel);
-        break;
-      }
-    }
-  }
+
+  let o = GetObjectById(name);
+  if (o && o.SetFreeSkillPoint)
+    o.SetFreeSkillPoint(value * currentLevel);
 }
 module.exports.SetFreePoints = SetFreePoints;
 
 function ChangeMaxValue(name) {
-  for (let i = 0; i < ids.length; i++) {
-    if (idObjects[name + ids[i]]) {
-      let o = world.getObjectById(idObjects[name + ids[i]]);
-      if (o.ChangeMaxHealth) {
-        o.ChangeMaxHealth();
-        break;
-      }
-    }
-  }
+  let o = GetObjectById(name);
+  if (o && o.ChangeMaxHealth)
+    o.ChangeMaxHealth();
 }
 
 function SetCurrentLevel(name, value) {
@@ -57,26 +50,16 @@ function GetCurrentLevel() {
 module.exports.GetCurrentLevel = GetCurrentLevel;
 //-----------------------------------------------------------------
 function AddValueMain(name, nameValue, value, type) {
-  for (let i = 0; i < ids.length; i++) {
-    if (idObjects[name + ids[i]]) {
-      let o = world.getObjectById(idObjects[name + ids[i]]);
-      if (o.getTemplateMetadata() == type) {
-        o.AdditionMain(nameValue, value);
-      }
-    }
-  }
+  let o = GetObjectById(name);
+  if (o && o.getTemplateMetadata() == type)
+    o.AdditionMain(nameValue, value);
 }
 module.exports.AddValueMain = AddValueMain;
 
 function AddConditionMain(name, nameValue, condition, type) {
-  for (let i = 0; i < ids.length; i++) {
-    if (idObjects[name + ids[i]]) {
-      let o = world.getObjectById(idObjects[name + ids[i]]);
-      if (o.getTemplateMetadata() == type) {
-        o.ConditionMain(nameValue, condition);
-      }
-    }
-  }
+  let o = GetObjectById(name);
+  if (o && o.getTemplateMetadata() == type)
+    o.ConditionMain(nameValue, condition);
 }
 module.exports.AddConditionMain = AddConditionMain;
 //-----------------------------------------------------------------

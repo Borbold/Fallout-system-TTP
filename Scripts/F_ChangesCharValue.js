@@ -18,7 +18,7 @@ refObject.onCreated.add(() => {
 })
 //-----------------------------------------------------------------
 refObject.ChangeValues = (name, description, grab) => {
-  figurePlate.ChangeNamesBonus(name, grab);
+  figurePlate.ChangeNameBonus(name, grab);
 
   itemGrab = grab;
   let brokenDescription = description.split(/\s?\n/);
