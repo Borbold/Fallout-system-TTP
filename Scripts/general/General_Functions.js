@@ -1,3 +1,4 @@
+const { world } = require('@tabletop-playground/api');
 let idObjects = [], ids = [];
 //-----------------------------------------------------------------
 function SetIdObject(name, id) {
@@ -193,3 +194,12 @@ function ConditionValue(value, checkValue, condition) {
     return value != checkValue;
   }
 }
+//-----------------------------------------------------------------
+function CheckPlayerColor(player, check) {
+  if (player.r == check.r && player.g == check.g && player.b == check.b) {
+    return true;
+  } else {
+    world.broadcastChatMessage("Only the GM (black player) is allowed to press this button", GetTextColor());
+  }
+}
+module.exports.CheckPlayerColor = CheckPlayerColor;

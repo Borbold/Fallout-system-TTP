@@ -1,5 +1,5 @@
 ﻿const { refObject, world } = require('@tabletop-playground/api');
-const { ChangeImageSlider, PositionsFontUI, SetCurrentLevel, CreateCanvasElement, GetTextFont, GetTextColor } = require('./general/General_Functions.js');
+const { ChangeImageSlider, PositionsFontUI, SetCurrentLevel, CreateCanvasElement, GetTextFont, GetTextColor, CheckPlayerColor } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   loadState();
@@ -107,20 +107,21 @@ class LevelBox {
       saveState();
     });
     //--Reset-----------------------
-    this.resetButton = new ImageButton().setImage("resetl1.png");
-    this.resetButton.setImageSize(200);
-    nC.addChild(this.resetButton, 1385, 15, 200, 100);
-    //-------------------------
-    this.resetButton.onClicked.add((obj, player) => {
-      t.valueLevel = 1;
-      t.valueExperience = 0;
-      let allObject = world.getAllObjects();
-      for (let i = 0; i < allObject.length; i++) {
-        if (refObject != allObject[i] && refObject.getName() == allObject[i].getName()) {
-          allObject[i].ResetValue();
+    let resetButton = new ImageButton().setImage("resetl1.png");
+    resetButton.setImageSize(200);
+    nC.addChild(resetButton, widgetWidth - 215, 15, 200, 100);
+    resetButton.onClicked.add((obj, player) => {
+      if (CheckPlayerColor(player.getPlayerColor(), new Color(0, 0, 0))) {
+        t.valueLevel = 1;
+        t.valueExperience = 0;
+        let allObject = world.getAllObjects();
+        for (let i = 0; i < allObject.length; i++) {
+          if (refObject != allObject[i] && refObject.getName() == allObject[i].getName()) {
+            allObject[i].ResetValue();
+          }
         }
+        saveState();
       }
-      saveState();
     })
   }
   //-------------------------
