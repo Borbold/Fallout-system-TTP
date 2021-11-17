@@ -3,7 +3,7 @@ const { CreateCanvasElement, GetTextFont, GetTextColor } = require('./general/Ge
 // Создание контейнера
 //world.createObjectFromTemplate("4FAE907E424F76032216F4B2200F27CD", refObject.getPosition().add(new Vector(20, 0, 0)));
 //-----------------------------------------------------------------
-const zPosition = 0.55;
+const zPosition = refObject.getExtent().z + 0.01;
 const widgetWidth = 4000;
 const widgetHeight = 2000;
 const nameFont = GetTextFont();
@@ -29,12 +29,26 @@ class Store {
       let brokenText = text.split(/\s?\n/);
       for (let i = 0; i < brokenText.length; i++) {
         if (brokenText[i].includes("+")) {
-          let items = pounches[i - 1].getItems();
-          for (let j = 0; j < items.length; j++) {
-            pounches[i - 1].take(items[j], refObject.getSnapPoint(j).getGlobalPosition().add(new Vector(0, 0, zPosition)));
+          dispersedItems = pounches[i - 1].getItems();
+          for (let j = 0; j < dispersedItems.length; j++) {
+            pounches[i - 1].take(dispersedItems[j],
+              refObject.getSnapPoint(j).getGlobalPosition().add(new Vector(0, 0, zPosition)));
           }
+        } else if (brokenText[i].includes("-")) {
+          pounches[i - 1].addObjects(dispersedItems);
         }
       }
+    })
+    //-------------------------
+    let but = new Button().setText("G");
+    but.setFontSize(40);
+    nC.addChild(but, 0, 0, 200, 200);
+    but.onClicked.add(() => {
+      let newPounch = world.createObjectFromTemplate("4FAE907E424F76032216F4B2200F27CD", refObject.getPosition().add(new Vector(20, 0, 0)));
+      newPounch.addObjects(dispersedItems);
+      pounches.push(newPounch);
+      dispersedItems = [];
+      store.SetNewStore();
     })
   }
 
@@ -70,8 +84,4 @@ refObject.ChangeDispersedItems = (item, remove) => {
       dispersedItems.push(item);
     }
   }
-  let newPounch = world.createObjectFromTemplate("4FAE907E424F76032216F4B2200F27CD", refObject.getPosition().add(new Vector(20, 0, 0)));
-  newPounch.addObjects(dispersedItems);
-  pounches.push(newPounch);
-  store.SetNewStore();
 }
