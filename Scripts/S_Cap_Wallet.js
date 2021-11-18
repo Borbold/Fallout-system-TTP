@@ -1,7 +1,27 @@
 const { refObject } = require('@tabletop-playground/api');
 const { CreateCanvasElement, GetTextFont, GetTextColor } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
-const zPosition = 0.03;
+let snapingObjectId;
+refObject.onSnapped.add((o, _2, snapPoint) => {
+  if (!snapPoint.snapsRotation()) {
+    let snapingObject = snapPoint.getParentObject();
+    if (snapingObject.SetCapWallet) {
+      snapingObject.SetCapWallet(wallet);
+    }
+  }
+})
+
+refObject.onGrab.add((o) => {
+  if (snapingObjectId) {
+    let snapingObject = world.getObjectById(snapingObjectId);
+    if (snapingObject.SetCapWallet) {
+      snapingObject.SetCapWallet(wallet, true);
+      snapingObjectId = 0;
+    }
+  }
+})
+//-----------------------------------------------------------------
+const zPosition = refObject.getExtent().z + 0.05;
 const widgetWidth = 200;
 const widgetHeight = 200;
 const nameFont = GetTextFont();
@@ -67,7 +87,7 @@ class Wallet {
   }
 
   set Value(value) { this.countCapText.setText(value); }
-  get Value() { return parseInt(this.countCapText.getText()); }
+  get Value() { return Math.round(this.countCapText.getText()); }
 
   HideUI(nCUI) {
     nCUI.scale = 0.01;
@@ -102,7 +122,3 @@ function loadState() {
 //-----------------------------------------------------------------
 loadState();
 let wallet = new Wallet(refObject, new Vector(0, 0, zPosition));
-//-----------------------------------------------------------------
-refObject.GetWalletPlate = () => {
-  return wallet;
-}

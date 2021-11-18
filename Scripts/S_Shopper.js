@@ -53,9 +53,9 @@ class Store {
   }
 
   SetNewStore() {
-    let newText = this.startText + "\n";
+    let newText = this.startText;
     for (const pounch of pounches) {
-      newText += "New store" + "\n";
+      newText += "\n" + "New store";
     }
     this.storeBox.setText(newText);
   }
@@ -83,5 +83,26 @@ refObject.ChangeDispersedItems = (item, remove) => {
     if (!flag) {
       dispersedItems.push(item);
     }
+  }
+}
+//-----------------------------------------------------------------
+let walletPlate;
+refObject.SetCapWallet = (plate, remove) => {
+  if (remove) {
+    walletPlate = null;
+  } else {
+    walletPlate = plate;
+  }
+}
+refObject.ChangeCountCap = (price) => {
+  if (walletPlate) {
+    if (walletPlate.Value -= price > 0) {
+      walletPlate.Value -= price;
+      return true;
+    } else {
+      world.broadcastChatMessage("You don't have enough money", new Color(1, 0.25, 0.25));
+    }
+  } else {
+    world.broadcastChatMessage("Wallet is not posted on the store", new Color(1, 0.25, 0.25));
   }
 }

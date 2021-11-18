@@ -47,8 +47,18 @@ refObject.onGrab.add((o) => {
   }
 })
 //-----------------------------------------------------------------
+let itemsPurchased = [];
 class BuyItem {
   constructor(parent, position) {
+    let description = refObject.getDescription();
+    let brokenDescription = description.split(/\s?\n/);
+    let price = 0; let wLooking = "price:"
+    for (const text of brokenDescription) {
+      if (text.includes("price:")) {
+        price = parseInt(text.slice(wLooking.length + 1));
+      }
+    }
+    //-------------------------
     let t = this;
     this.parent = refObject;
     this.hidePosition = position;
@@ -62,16 +72,24 @@ class BuyItem {
     let buyItemIcon = new ImageButton().setImage("buy-icon.png");
     nC.addChild(buyItemIcon, widgetWidth - 30, 0, 30, 30);
     buyItemIcon.onClicked.add(() => {
-      let allSnap = t.snapingObject.getAllSnapPoints();
-      let newObject = world.createObjectFromTemplate(refObject.getTemplateId(),
-        t.snapingObject.getSnapPoint(allSnap.length - 1).getGlobalPosition());
-      newObject.setName(refObject.getName()); newObject.setDescription(refObject.getDescription());
+      //-1 так как в данном месте код багает
+      if (t.snapingObject.ChangeCountCap(price - 1)) {
+        let allSnap = t.snapingObject.getAllSnapPoints();
+        let newObject = world.createObjectFromTemplate(refObject.getTemplateId(),
+          t.snapingObject.getSnapPoint(allSnap.length - 1).getGlobalPosition());
+        newObject.setName(refObject.getName()); newObject.setDescription(refObject.getDescription());
+        itemsPurchased.push(newObject);
+      }
     })
     //-------------------------
     let crossIcon = new ImageButton().setImage("cross-icon-2.png");
     nC.addChild(crossIcon, 0, 0, 30, 30);
     crossIcon.onClicked.add(() => {
-
+      if (itemsPurchased.length > 0) {
+        let deleteItem = itemsPurchased.pop();
+        deleteItem.destroy();
+        t.snapingObject.ChangeCountCap(-price);
+      }
     })
   }
 
