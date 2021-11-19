@@ -1,18 +1,12 @@
 const { refObject, world, refPackageId } = require('@tabletop-playground/api');
-const { CreateCanvasElement, GetTextFont, GetTextColor } = require('./general/General_Functions.js');
+const { CreateCanvasElement } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 const zPosition = refObject.getExtent().z + 0.01;
 const widgetWidth = refObject.getExtent().x * 200;
 const widgetHeight = refObject.getExtent().y * 200;
-const nameFont = GetTextFont();
-const textColor = GetTextColor();
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   loadState();
-})
-
-refObject.onHit.add(() => {
-  
 })
 
 let snapingObjectId;
@@ -26,7 +20,6 @@ refObject.onSnapped.add((o, _2, snapPoint) => {
     } else if (snapingObject.ChangeDispersedItems) {
       snapingObject.ChangeDispersedItems(o);
       snapingObjectId = snapingObject.getId();
-      buyItem.ShowUI();
       saveState();
     }
   }
@@ -64,14 +57,14 @@ class BuyItem {
     this.hidePosition = position;
     this.startPosition = new Vector(0, 0, zPosition);
     //-------------------------
-    let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
+    this.nC = new Canvas();
+    this.nCUI = CreateCanvasElement(this.nC, position, widgetWidth, widgetHeight);
     this.nCUI.rotation = new Rotator(0, 0, 0);
     parent.attachUI(this.nCUI);
     //-------------------------
-    let buyItemIcon = new ImageButton().setImage("buy-icon.png");
-    nC.addChild(buyItemIcon, widgetWidth - 30, 0, 30, 30);
-    buyItemIcon.onClicked.add(() => {
+    this.buyItemIcon = new ImageButton().setImage("buy-icon.png");
+    this.nC.addChild(this.buyItemIcon, widgetWidth - 30, 0, 30, 30);
+    this.buyItemIcon.onClicked.add(() => {
       //-1 так как в данном месте код багает
       if (t.snapingObject.ChangeCountCap(price - 1)) {
         let allSnap = t.snapingObject.getAllSnapPoints();
@@ -82,9 +75,9 @@ class BuyItem {
       }
     })
     //-------------------------
-    let crossIcon = new ImageButton().setImage("cross-icon-2.png");
-    nC.addChild(crossIcon, 0, 0, 30, 30);
-    crossIcon.onClicked.add(() => {
+    this.crossIcon = new ImageButton().setImage("cross-icon-2.png");
+    this.nC.addChild(this.crossIcon, 0, 0, 30, 30);
+    this.crossIcon.onClicked.add(() => {
       if (itemsPurchased.length > 0) {
         let deleteItem = itemsPurchased.pop();
         deleteItem.destroy();
@@ -104,6 +97,10 @@ class BuyItem {
   }
 }
 let buyItem = new BuyItem(refObject, new Vector(0, 0, 0));
+//-----------------------------------------------------------------
+refObject.ShowBuyItem = () => {
+  buyItem.ShowUI();
+}
 //-----------------------------------------------------------------
 function saveState() {
   let state = {};

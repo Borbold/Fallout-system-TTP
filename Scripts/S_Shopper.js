@@ -5,12 +5,13 @@ const { CreateCanvasElement, GetTextFont, GetTextColor } = require('./general/Ge
 //-----------------------------------------------------------------
 const zPosition = refObject.getExtent().z + 0.01;
 const widgetWidth = 4000;
-const widgetHeight = 2000;
+const offsetPlateY = 200;
+const widgetHeight = 2000 + offsetPlateY;
 const nameFont = GetTextFont();
 const textColor = GetTextColor();
 //-----------------------------------------------------------------
 let dispersedItems = [];
-let pounches = [];
+let pounches = [], namedStores = [];
 class Store {
   constructor(parent, position) {
     let t = this;
@@ -24,38 +25,55 @@ class Store {
     //-------------------------
     this.storeBox = new MultilineTextBox().setText(this.startText).setTextColor(textColor).setFont(nameFont);
     this.storeBox.setFontSize(100).setBackgroundTransparent(true);
-    nC.addChild(this.storeBox, widgetWidth - 1010, 25, 1000, widgetHeight - 690);
+    nC.addChild(this.storeBox, widgetWidth - 1010, offsetPlateY / 2 + 25, 1000, widgetHeight - 690 - offsetPlateY);
     this.storeBox.onTextCommitted.add((_1, _2, text) => {
-      let brokenText = text.split(/\s?\n/);
-      for (let i = 0; i < brokenText.length; i++) {
-        if (brokenText[i].includes("+")) {
-          dispersedItems = pounches[i - 1].getItems();
-          for (let j = 0; j < dispersedItems.length; j++) {
-            pounches[i - 1].take(dispersedItems[j],
-              refObject.getSnapPoint(j).getGlobalPosition().add(new Vector(0, 0, zPosition)));
+      namedStores = text.split(/\s?\n/);
+      for (let i = 0; i < namedStores.length; i++) {
+        if (namedStores[i].includes("+") && dispersedItems.length == 0) {
+          let pounchItems = pounches[i - 1].getItems();
+          for (let j = 0; j < pounchItems.length; j++) {
+            let newObject = world.createObjectFromJSON(pounchItems[j].toJSONString(), new Vector());
+            setTimeout(() => {
+              dispersedItems.push(newObject);
+              newObject.setPosition(refObject.getSnapPoint(j).getGlobalPosition().add(new Vector(0, 0, zPosition)));
+              newObject.ShowBuyItem();
+            }, 50);
           }
-        } else if (brokenText[i].includes("-")) {
-          pounches[i - 1].addObjects(dispersedItems);
+        } else if (namedStores[i].includes("-") && dispersedItems.length > 0) {
+          for (const item of dispersedItems) {
+            item.destroy();
+          }
+          dispersedItems = [];
         }
       }
+      saveState();
     })
     //-------------------------
-    let but = new Button().setText("G");
-    but.setFontSize(40);
-    nC.addChild(but, 0, 0, 200, 200);
-    but.onClicked.add(() => {
+    this.butNewStore = new Button().setText("Create new store").setTextColor(textColor).setFont(nameFont).setEnabled(false);
+    this.butNewStore.setFontSize(70);
+    nC.addChild(this.butNewStore, widgetWidth - 840, 0, 650, offsetPlateY / 2);
+    this.butNewStore.onClicked.add(() => {
       let newPounch = world.createObjectFromTemplate("4FAE907E424F76032216F4B2200F27CD", refObject.getPosition().add(new Vector(20, 0, 0)));
       newPounch.addObjects(dispersedItems);
       pounches.push(newPounch);
       dispersedItems = [];
-      store.SetNewStore();
+      store.SetNewStore(true);
+      t.butNewStore.setEnabled(false);
+      saveState();
     })
   }
 
-  SetNewStore() {
-    let newText = this.startText;
-    for (const pounch of pounches) {
-      newText += "\n" + "New store";
+  SetNewStore(newStore) {
+    let newText = "";
+    if (namedStores.length > 0 && !newStore) {
+      for (let i = 0; i < namedStores.length; i++) {
+        newText += (i && "\n" || "") + namedStores[i];
+      }
+    } else {
+      newText += this.startText;
+      for (let i = 0; i < pounches.length; i++) {
+        newText += "\n" + "New store";
+      }
     }
     this.storeBox.setText(newText);
   }
@@ -84,6 +102,11 @@ refObject.ChangeDispersedItems = (item, remove) => {
       dispersedItems.push(item);
     }
   }
+  if (dispersedItems.length > 0) {
+    store.butNewStore.setEnabled(true);
+  } else {
+    store.butNewStore.setEnabled(false);
+  }
 }
 //-----------------------------------------------------------------
 let walletPlate;
@@ -106,3 +129,35 @@ refObject.ChangeCountCap = (price) => {
     world.broadcastChatMessage("Wallet is not posted on the store", new Color(1, 0.25, 0.25));
   }
 }
+//-----------------------------------------------------------------
+function saveState() {
+  let state = {};
+
+  let pounchesId = []
+  for (const pounche of pounches) {
+    pounchesId.push(pounche.getId());
+  }
+  state["pounchesId"] = pounchesId;
+  state["namedStores"] = namedStores;
+
+  refObject.setSavedData(JSON.stringify(state));
+}
+
+function loadState() {
+  if (refObject.getSavedData() === "") {
+    saveState();
+    return;
+  }
+
+  let state = JSON.parse(refObject.getSavedData());
+
+  let pounchesId = state["pounchesId"] || [];
+  for (const id of pounchesId) {
+    if(id)
+      pounches.push(world.getObjectById(id));
+  }
+  namedStores = state["namedStores"] || [];
+  
+  store.SetNewStore();
+}
+loadState();
