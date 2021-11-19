@@ -3,7 +3,7 @@ const { CreateCanvasElement, GetTextFont, GetTextColor } = require('./general/Ge
 // Создание контейнера
 //world.createObjectFromTemplate("4FAE907E424F76032216F4B2200F27CD", refObject.getPosition().add(new Vector(20, 0, 0)));
 //-----------------------------------------------------------------
-const zPosition = refObject.getExtent().z + 0.01;
+const zPosition = refObject.getExtent().z * 1.15;
 const widgetWidth = 4000;
 const offsetPlateY = 200;
 const widgetHeight = 2000 + offsetPlateY;
@@ -64,6 +64,10 @@ class Store {
   }
 
   SetNewStore(newStore) {
+    for (const item of dispersedItems) {
+      item.toggleLock();
+    }
+
     let newText = "";
     if (namedStores.length > 0 && !newStore) {
       for (let i = 0; i < namedStores.length; i++) {
@@ -82,14 +86,15 @@ let store = new Store(refObject, new Vector(0, 0, zPosition));
 //-----------------------------------------------------------------
 refObject.ChangeDispersedItems = (item, remove) => {
   if (remove) {
-    for (let i = 0; i < dispersedItems.length; i++) {
-      if (dispersedItems[i] == item) {
-        dispersedItems[i] = null;
+    for (const t of dispersedItems) {
+      let shiftItem = dispersedItems.shift();
+      if (shiftItem == item) {
         break;
+      } else {
+        dispersedItems.push(shiftItem);
       }
     }
   } else {
-    item.toggleLock();
     let flag;
     for (let i = 0; i < dispersedItems.length; i++) {
       if (!dispersedItems[i]) {
@@ -102,6 +107,7 @@ refObject.ChangeDispersedItems = (item, remove) => {
       dispersedItems.push(item);
     }
   }
+  
   if (dispersedItems.length > 0) {
     store.butNewStore.setEnabled(true);
   } else {
