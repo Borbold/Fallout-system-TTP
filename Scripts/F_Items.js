@@ -2,8 +2,8 @@ const { refObject, world } = require('@tabletop-playground/api');
 const { CreateCanvasElement } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 const zPosition = refObject.getExtent().z * 1.1;
-const widgetWidth = refObject.getExtent().x * 200;
-const widgetHeight = refObject.getExtent().y * 200;
+const widgetWidth = refObject.getExtent().y * 200;
+const widgetHeight = refObject.getExtent().x * 200;
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   loadState();

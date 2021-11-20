@@ -29,8 +29,12 @@ class Store {
     nC.addChild(this.storeBox, widgetWidth - 1010, offsetPlateY / 2 + 25, 1000, widgetHeight - 690 - offsetPlateY);
     this.storeBox.onTextCommitted.add((_1, _2, text) => {
       namedStores = text.split(/\s?\n/);
-      for (let i = 0; i < namedStores.length; i++) {
-        if (namedStores[i].includes("+") && dispersedItems.length == 0) {
+      saveState();
+    })
+    this.storeBox.onTextChanged.add((_1, _2, text) => {
+      let beakText = text.split(/\s?\n/);
+      for (let i = 0; i < beakText.length; i++) {
+        if (beakText[i].includes("+") && dispersedItems.length == 0) {
           let pounchItems = pounches[i - 1].getItems();
           for (let j = 0; j < pounchItems.length; j++) {
             let newObject = world.createObjectFromJSON(pounchItems[j].toJSONString(), new Vector());
@@ -42,16 +46,19 @@ class Store {
             discontText.setText("").setEnabled(true);
             discontText.setMaxLength(3).setInputType(3);
           }
-        } else if (namedStores[i].includes("-") && dispersedItems.length > 0) {
+          this.SetNewStore();
+          break;
+        } else if (beakText[i].includes("-") && dispersedItems.length > 0) {
           for (const item of dispersedItems) {
             item.destroy();
           }
           dispersedItems = [];
           discontText.setMaxLength(10).setInputType(0);
           discontText.setText("Discont %").setEnabled(false);
+          this.SetNewStore();
+          break;
         }
       }
-      saveState();
     })
     //-------------------------
     this.butNewStore = new Button().setText("Create new store").setTextColor(textColor).setFont(nameFont).setEnabled(false);
