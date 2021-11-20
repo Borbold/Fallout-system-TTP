@@ -3,7 +3,7 @@ const { CreateCanvasElement, GetTextFont, GetTextColor } = require('./general/Ge
 // Создание контейнера
 //world.createObjectFromTemplate("4FAE907E424F76032216F4B2200F27CD", refObject.getPosition().add(new Vector(20, 0, 0)));
 //-----------------------------------------------------------------
-const zPosition = refObject.getExtent().z * 1.15;
+const zPosition = refObject.getExtent().z * 1.05;
 const widgetWidth = 4000;
 const offsetPlateY = 200;
 const widgetHeight = 2000 + offsetPlateY;
@@ -12,6 +12,7 @@ const textColor = GetTextColor();
 //-----------------------------------------------------------------
 let dispersedItems = [];
 let pounches = [], namedStores = [];
+let discontValue = 0;
 class Store {
   constructor(parent, position) {
     let t = this;
@@ -36,14 +37,18 @@ class Store {
             setTimeout(() => {
               dispersedItems.push(newObject);
               newObject.setPosition(refObject.getSnapPoint(j).getGlobalPosition().add(new Vector(0, 0, zPosition)));
-              newObject.ShowBuyItem();
+              newObject.ShowBuyItem(refObject.getId());
             }, 50);
+            discontText.setText("").setEnabled(true);
+            discontText.setMaxLength(3).setInputType(3);
           }
         } else if (namedStores[i].includes("-") && dispersedItems.length > 0) {
           for (const item of dispersedItems) {
             item.destroy();
           }
           dispersedItems = [];
+          discontText.setMaxLength(10).setInputType(0);
+          discontText.setText("Discont %").setEnabled(false);
         }
       }
       saveState();
@@ -61,6 +66,13 @@ class Store {
       t.butNewStore.setEnabled(false);
       saveState();
     })
+    //-------------------------
+    let discontText = new TextBox().setText("Discont %").setTextColor(textColor).setFont(nameFont).setEnabled(false);
+    discontText.setFontSize(70);
+    nC.addChild(discontText, widgetWidth - 2500, 0, 350, offsetPlateY / 2);
+    discontText.onTextCommitted.add((_1, _2, text) => {
+      discontValue = parseInt(text);
+    });
   }
 
   SetNewStore(newStore) {
@@ -116,17 +128,14 @@ refObject.ChangeDispersedItems = (item, remove) => {
 }
 //-----------------------------------------------------------------
 let walletPlate;
-refObject.SetCapWallet = (plate, remove) => {
-  if (remove) {
-    walletPlate = null;
-  } else {
-    walletPlate = plate;
-  }
+refObject.SetCapWallet = (plate) => {
+  walletPlate = plate;
 }
 refObject.ChangeCountCap = (price) => {
+  let locPrice = price - ((price * (discontValue / 100)) || "0");
   if (walletPlate) {
-    if (walletPlate.Value -= price > 0) {
-      walletPlate.Value -= price;
+    if (walletPlate.Value - locPrice > 0) {
+      walletPlate.Value -= locPrice;
       return true;
     } else {
       world.broadcastChatMessage("You don't have enough money", new Color(1, 0.25, 0.25));

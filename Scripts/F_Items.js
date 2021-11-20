@@ -1,7 +1,7 @@
-const { refObject, world, refPackageId } = require('@tabletop-playground/api');
+const { refObject, world } = require('@tabletop-playground/api');
 const { CreateCanvasElement } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
-const zPosition = refObject.getExtent().z + 0.01;
+const zPosition = refObject.getExtent().z * 1.1;
 const widgetWidth = refObject.getExtent().x * 200;
 const widgetHeight = refObject.getExtent().y * 200;
 //-----------------------------------------------------------------
@@ -65,8 +65,7 @@ class BuyItem {
     this.buyItemIcon = new ImageButton().setImage("buy-icon.png");
     this.nC.addChild(this.buyItemIcon, widgetWidth - 30, 0, 30, 30);
     this.buyItemIcon.onClicked.add(() => {
-      //-1 так как в данном месте код багает
-      if (t.snapingObject.ChangeCountCap(price - 1)) {
+      if (t.snapingObject.ChangeCountCap(price)) {
         let allSnap = t.snapingObject.getAllSnapPoints();
         let newObject = world.createObjectFromTemplate(refObject.getTemplateId(),
           t.snapingObject.getSnapPoint(allSnap.length - 1).getGlobalPosition());
@@ -90,16 +89,16 @@ class BuyItem {
     this.nCUI.position = this.hidePosition;
     this.parent.updateUI(this.nCUI);
   }
-  ShowUI() {
+  ShowUI(snapId) {
     this.nCUI.position = this.startPosition;
-    this.snapingObject = world.getObjectById(snapingObjectId);
+    this.snapingObject = world.getObjectById(snapId || snapingObjectId);
     this.parent.updateUI(this.nCUI);
   }
 }
 let buyItem = new BuyItem(refObject, new Vector(0, 0, 0));
 //-----------------------------------------------------------------
-refObject.ShowBuyItem = () => {
-  buyItem.ShowUI();
+refObject.ShowBuyItem = (snapId) => {
+  buyItem.ShowUI(snapId);
 }
 //-----------------------------------------------------------------
 function saveState() {

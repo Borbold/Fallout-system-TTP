@@ -2,20 +2,21 @@ const { refObject } = require('@tabletop-playground/api');
 const { CreateCanvasElement, GetTextFont, GetTextColor } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 let snapingObjectId;
-refObject.onSnapped.add((o, _2, snapPoint) => {
+refObject.onSnapped.add((_1, _2, snapPoint) => {
   if (!snapPoint.snapsRotation()) {
     let snapingObject = snapPoint.getParentObject();
     if (snapingObject.SetCapWallet) {
       snapingObject.SetCapWallet(wallet);
+      snapingObjectId = snapingObject.getId();
     }
   }
 })
 
-refObject.onGrab.add((o) => {
+refObject.onGrab.add(() => {
   if (snapingObjectId) {
     let snapingObject = world.getObjectById(snapingObjectId);
     if (snapingObject.SetCapWallet) {
-      snapingObject.SetCapWallet(wallet, true);
+      snapingObject.SetCapWallet(null);
       snapingObjectId = 0;
     }
   }
