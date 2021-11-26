@@ -6,9 +6,9 @@ refObject.onCreated.add(() => {
 })
 //-----------------------------------------------------------------
 const zPosition = refObject.getExtent().z * 1.15;
-const widgetWidth = 800;
+const widgetWidth = refObject.getExtent().x * 200;
 const offsetPlateY = 200;
-const widgetHeight = 1600 + offsetPlateY;
+const widgetHeight = refObject.getExtent().y * 200 + offsetPlateY;
 const nameFont = GetTextFont();
 const textColor = GetTextColor();
 //-----------------------------------------------------------------

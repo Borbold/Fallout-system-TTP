@@ -39,8 +39,9 @@ class Store {
           for (let j = 0; j < pounchItems.length; j++) {
             let newObject = world.createObjectFromJSON(pounchItems[j].toJSONString(), new Vector());
             setTimeout(() => {
+              let posJ = newObject.getExtent().y * 2 > 1.6 && j + 10 || j;
               dispersedItems.push(newObject);
-              newObject.setPosition(refObject.getSnapPoint(j).getGlobalPosition().add(new Vector(0, 0, zPosition)));
+              newObject.setPosition(refObject.getSnapPoint(posJ).getGlobalPosition().add(new Vector(0, 0, zPosition)));
               newObject.ShowBuyItem(refObject.getId());
             }, 50);
             discontText.setText("").setEnabled(true);
@@ -55,8 +56,10 @@ class Store {
           dispersedItems = [];
           discontText.setMaxLength(10).setInputType(0);
           discontText.setText("Discont %").setEnabled(false);
-          this.SetNewStore();
+          t.SetNewStore();
           break;
+        } else if (beakText[i].includes("+") || beakText[i].includes("-")) {
+          this.SetNewStore();
         }
       }
     })
@@ -68,8 +71,8 @@ class Store {
       let newPounch = world.createObjectFromTemplate("4FAE907E424F76032216F4B2200F27CD", refObject.getPosition().add(new Vector(20, 0, 0)));
       newPounch.addObjects(dispersedItems);
       pounches.push(newPounch);
-      dispersedItems = [];
-      store.SetNewStore(true);
+      dispersedItems = []; namedStores.push("");
+      store.SetNewStore();
       t.butNewStore.setEnabled(false);
       saveState();
     })
@@ -82,20 +85,15 @@ class Store {
     });
   }
 
-  SetNewStore(newStore) {
+  SetNewStore() {
     for (const item of dispersedItems) {
       item.toggleLock();
     }
 
-    let newText = "";
-    if (namedStores.length > 0 && !newStore) {
-      for (let i = 0; i < namedStores.length; i++) {
-        newText += (i && "\n" || "") + namedStores[i];
-      }
-    } else {
-      newText += this.startText;
-      for (let i = 0; i < pounches.length; i++) {
-        newText += "\n" + "New store";
+    let newText = this.startText;
+    if (namedStores.length > 1) {
+      for (let i = 1; i < namedStores.length; i++) {
+        newText += "\n" + (namedStores[i] != "" && namedStores[i] || "New store");
       }
     }
     this.storeBox.setText(newText);
