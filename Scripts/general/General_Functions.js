@@ -1,5 +1,7 @@
 const { world } = require('@tabletop-playground/api');
 let idObjects = [], ids = [];
+let nameFont = GetTextFont();
+let textColor = GetTextColor();
 //-----------------------------------------------------------------
 function SetIdObject(name, id) {
   idObjects[name + id] = id;
@@ -91,6 +93,19 @@ const TypeShow = {
   PROCENT: 1,
 }
 module.exports.TypeShow = TypeShow;
+
+function CreateImageSlider(parent, frontSlider, fText, backA) {
+  if (backA) {
+    let back = new ImageWidget().setImage(backA.tex);
+    parent.nC.addChild(back, backA.pos.x, backA.pos.y, backA.w, backA.h);
+  }
+  //-------------------------
+  parent.nC.addChild(frontSlider.slider, parent.startPosition.x, parent.startPosition.y, frontSlider.w, frontSlider.h);
+  //-------------------------
+  parent.fontText = new Text().setText(parent.Ex + "/" + parent.maxEx).setFont(nameFont).setTextColor(textColor).setFontSize(fText.fontSize || 40);
+  parent.nC.addChild(parent.fontText, fText.x, fText.y, fText.w, fText.h);
+}
+module.exports.CreateImageSlider = CreateImageSlider;
 
 function ChangeImageSlider(image, value, maxValue, position, text, parent, type, height, multiply) {
   type = type || TypeShow.STANDART; multiply = multiply || 10;
@@ -190,13 +205,13 @@ function CheckPlayerColor(player, check) {
   if (player.r == check.r && player.g == check.g && player.b == check.b) {
     return true;
   } else {
-    world.broadcastChatMessage("Only the GM (black player) is allowed to press this button", GetTextColor());
+    world.broadcastChatMessage("Only the GM (black player) is allowed to press this button", textColor);
   }
 }
 module.exports.CheckPlayerColor = CheckPlayerColor;
 //-----------------------------------------------------------------
 function CreateNumberButton(boxTable, fontSize) {
-  let newButton = new Button().setText("1").setFont(GetTextFont()).setTextColor(GetTextColor()).setFontSize(fontSize || 40);
+  let newButton = new Button().setText("1").setFont(nameFont).setTextColor(textColor).setFontSize(fontSize || 40);
   let boxIndex = 0;
   newButton.onClicked.add(() => {
     boxIndex++;
@@ -239,4 +254,15 @@ function DecreaseParametersItem(obj, snapingObjectId) {
   return snapingObjectId;
 }
 module.exports.DecreaseParametersItem = DecreaseParametersItem;
+//-----------------------------------------------------------------
+function CreatePlusMinusButton(parent, func, png, pos, size) {
+  let decrementL = new ImageButton().setImage(png[0]).setImageSize(100);
+  parent.addChild(decrementL, pos[0].x, pos[0].y, size, size);
+  decrementL.onClicked.add(func.minusF);
+  //-------------------------
+  let incrementL = new ImageButton().setImage(png[1]).setImageSize(100);
+  parent.addChild(incrementL, pos[1].x, pos[1].y, size, size);
+  incrementL.onClicked.add(func.plusF);
+}
+module.exports.CreatePlusMinusButton = CreatePlusMinusButton;
 //-----------------------------------------------------------------

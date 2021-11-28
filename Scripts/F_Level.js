@@ -1,5 +1,6 @@
 ﻿const { refObject, world } = require('@tabletop-playground/api');
-const { ChangeImageSlider, SetCurrentLevel, CreateCanvasElement, GetTextFont, GetTextColor, CheckPlayerColor, CreateNumberButton } = require('./general/General_Functions.js');
+const { ChangeImageSlider, SetCurrentLevel, CreateCanvasElement, GetTextFont, GetTextColor, CheckPlayerColor,
+  CreateNumberButton, CreatePlusMinusButton, CreateImageSlider } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   loadState();
@@ -26,55 +27,40 @@ class LevelBox {
     this.changedButton = CreateNumberButton([1, 5, 10, 25, 50, 100]);
     this.nC.addChild(this.changedButton, 440, 145, 100, 80);
     //-------------------------
-    let decrementE = new ImageButton().setImage("minus.png");
-    decrementE.setImageSize(200);
-    this.nC.addChild(decrementE, 15, 305, 80, 80);
-    //-------------------------
-    let incrementE = new ImageButton().setImage("plus.png");
-    incrementE.setImageSize(200);
-    this.nC.addChild(incrementE, 1505, 305, 80, 80);
-    //-------------------------
-    this.back = new ImageWidget().setImage("bar1.png");
-    this.nC.addChild(this.back, 100, 310, 1400, 80);
+    CreatePlusMinusButton(this.nC,
+      { plusF: () => {
+        t.valueExperience += t.changedValueE;
+        if (!t.firstTime) saveState(); else t.firstTime = false;
+      },
+        minusF: () => {
+        t.valueExperience -= t.changedValueE;
+        if (!t.firstTime) saveState(); else t.firstTime = false;
+        }
+      }, ["minus.png", "plus.png"], [new Vector(15, 305), new Vector(1505, 305)], 80);
     //-------------------------
     this.experienceSlider = new ImageWidget().setImage("barline1.png");
-    this.nC.addChild(this.experienceSlider, this.startPosition.x, this.startPosition.y, 60, 80);
-    //-------------------------
-    this.fontText = new Text().setText(this.Ex + "/" + this.maxEx).setFont(nameFont).setTextColor(textColor);
-    this.fontText.setFontSize(40);
-    this.nC.addChild(this.fontText, this.startPosition.x + 630, this.startPosition.y + 15, 200, 60);
-    //-------------------------
-    decrementE.onClicked.add(function () {
-      t.valueExperience -= t.changedValueE;
-      if (!t.firstTime) saveState(); else t.firstTime = false;
-    });
-    incrementE.onClicked.add(function () {
-      t.valueExperience += t.changedValueE;
-      if (!t.firstTime) saveState(); else t.firstTime = false;
-    });
+    CreateImageSlider(this,
+      { slider: t.experienceSlider, w: 60, h: 80 },
+      { fontSize: 40, x: t.startPosition.x + 630, y: t.startPosition.y + 15, w: 200, h: 60 },
+      { tex: "bar1.png", pos: new Vector(100, 310), w: 1400, h: 80 });
     //--Level-----------------------
     this.textLevel = new Text().setText("1").setFont(nameFont).setEnabled(false).setTextColor(textColor);
     this.textLevel.setFontSize(50);
     this.nC.addChild(this.textLevel, 460, 50, 100, 80);
     //-------------------------
-    let decrementL = new ImageButton().setImage("minus.png");
-    decrementL.setImageSize(100);
-    this.nC.addChild(decrementL, 350, 45, 80, 80);
-    //-------------------------
-    let incrementL = new ImageButton().setImage("plus.png");
-    incrementL.setImageSize(100);
-    this.nC.addChild(incrementL, 550, 45, 80, 80);
-    //-------------------------
-    decrementL.onClicked.add(function () {
-      if (t.valueLevel > 1) {
-        t.valueLevel -= 1;
-        saveState();
-      }
-    });
-    incrementL.onClicked.add(function () {
-      t.valueLevel += 1;
-      saveState();
-    });
+    CreatePlusMinusButton(this.nC,
+      {
+        plusF: () => {
+          t.valueLevel += 1;
+          saveState();
+        },
+        minusF: () => {
+          if (t.valueLevel > 1) {
+            t.valueLevel -= 1;
+            saveState();
+          }
+        }
+      }, ["minus.png", "plus.png"], [new Vector(360, 50), new Vector(540, 50)], 80);
     //--Reset-----------------------
     let resetButton = new ImageButton().setImage("resetl1.png");
     resetButton.setImageSize(200);

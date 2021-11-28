@@ -1,4 +1,4 @@
-const { refObject } = require('@tabletop-playground/api');
+const { refObject, world } = require('@tabletop-playground/api');
 const { SetIdObject, TypeCharacteristic, CreateCanvasElement, GetTextFont, GetTextColor, CalculateConditionValue } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
@@ -6,8 +6,8 @@ refObject.onCreated.add(() => {
 })
 //-----------------------------------------------------------------
 const zPosition = 0.1;
-const widgetWidth = 1600;
-const widgetHeight = 1000;
+const widgetWidth = refObject.getExtent().y * 200;
+const widgetHeight = refObject.getExtent().x * 200;
 let nameFont = GetTextFont();
 let textColor = GetTextColor();
 //-----------------------------------------------------------------
@@ -95,20 +95,33 @@ function CreateChangerTextBox(parent, index, position, array, isMain) {
 }
 
 function CreateSelectedButton(parent, position, index) {
-  let star = new ImageButton().setImage("stare.png").setEnabled(false);
+  let showStar = selectedSkills[index] && 50 || 1;
+  let star = new ImageButton().setImage("stare.png");
   star.setImageSize(100);
+  star.onClicked.add(() => {
+    if (selectedSkills[index]) {
+      countSelected--;
+      selectedSkills[index] = false;
+      parent.updateChild(star, 0, 0, 1, 1);
+      parent.updateChild(selected, position.x, position.y, 50, 50);
+      RecalculationMajorSkills(index);
+    }
+  })
+  parent.addChild(star, position.x, position.y, showStar, showStar);
+
+  let showSelected = !selectedSkills[index] && 50 || 1;
   let selected = new ImageButton().setImage("black-squad.png");
   selected.setImageSize(100);
   selected.onClicked.add(() => {
     if (countSelected < 3) {
       countSelected++;
       selectedSkills[index] = true;
-      parent.removeChild(selected);
-      parent.addChild(star, position.x, position.y, 50, 50);
+      parent.updateChild(selected, 0, 0, 1, 1);
+      parent.updateChild(star, position.x, position.y, 50, 50);
       RecalculationMajorSkills(index);
     }
   })
-  parent.addChild(selectedSkills[index] && star || selected, position.x, position.y, 50, 50);
+  parent.addChild(selected, position.x, position.y, showSelected, showSelected);
 }
 //-----------------------------------------------------------------
 class SkillsMajor {

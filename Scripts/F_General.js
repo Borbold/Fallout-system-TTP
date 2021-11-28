@@ -1,5 +1,5 @@
 const { refObject } = require('@tabletop-playground/api');
-const { ChangeImageSlider, TypeShow, CreateCanvasElement, GetTextFont, GetTextColor, CreateNumberButton } = require('./general/General_Functions.js');
+const { ChangeImageSlider, TypeShow, CreateCanvasElement, GetTextFont, GetTextColor, CreateNumberButton, CreatePlusMinusButton, CreateImageSlider } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 let figurePlate;
 refObject.onCreated.add(() => {
@@ -49,27 +49,21 @@ class HelthPoints {
     this.backText.setFontSize(40);
     this.nC.addChild(this.backText, 15, 180, 350, 80);
     //-------------------------
+    CreatePlusMinusButton(this.nC,
+      {
+        plusF: () => {
+          t.IncreaseValue();
+        },
+        minusF: () => {
+          t.DecreaseValue();
+        }
+      }, ["minus.png", "plus.png"], [new Vector(390, 90), new Vector(1490, 90)], 60);
+    //-------------------------
     this.helth = new ImageWidget().setImage("barline1.png");
-    this.nC.addChild(this.helth, this.startPosition.x, this.startPosition.y, 1, 1);
+    CreateImageSlider(this,
+      { slider: t.helth, w: 60, h: 80 },
+      { fontSize: 40, x: t.startPosition.x + 450, y: t.startPosition.y + 5, w: 110, h: 60 });
     //-------------------------
-    this.decrement = new ImageButton().setImage("minus.png");
-    this.decrement.setImageSize(100);
-    this.nC.addChild(this.decrement, 390, 90, 60, 60);
-    //-------------------------
-    this.increment = new ImageButton().setImage("plus.png");
-    this.increment.setImageSize(100);
-    this.nC.addChild(this.increment, 1490, 90, 60, 60);
-    //-------------------------
-    this.fontText = new Text().setText("%").setTextColor(new Color(0.75, 0.75, 0.75)).setFont(nameFont).setTextColor(textColor);
-    this.fontText.setFontSize(40);
-    this.nC.addChild(this.fontText, 920, 95, 110, 60);
-    //-------------------------
-    this.decrement.onClicked.add(function () {
-      t.DecreaseValue();
-    });
-    this.increment.onClicked.add(function () {
-      t.IncreaseValue();
-    });
     this.backText.onClicked.add(() => {
       t.value = t.maxHelthValue;
     });
@@ -135,18 +129,18 @@ class ActionPoints {
     this.quantityAction = 7;
     this.maxAction = 7;
     this.totalAction = 15;
-    this.startPosition = new Vector(458, 85);
+    this.startPosition = new Vector(458, 0);
     //-------------------------
     this.nC = new Canvas();
-    let nCUI = CreateCanvasElement(this.nC, position.add(new Vector(0.6, 0, 0)), widgetWidth, widgetHeight / 2);
+    let nCUI = CreateCanvasElement(this.nC, position.add(new Vector(1.46, 0, 0)), widgetWidth, widgetHeight / 2);
     parent.attachUI(nCUI);
     //-------------------------
     this.changedButton = CreateNumberButton([1, 2, 4]);
-    this.nC.addChild(this.changedButton, 440, 180, 100, 80);
+    this.nC.addChild(this.changedButton, 440, 100, 100, 80);
     //-------------------------
     this.backText = new Button().setText(this.quantityAction + "/" + this.maxAction + " max").setFont(nameFont).setTextColor(textColor);
     this.backText.setFontSize(40);
-    this.nC.addChild(this.backText, 15, 180, 350, 80);
+    this.nC.addChild(this.backText, 15, 100, 350, 80);
     //-------------------------
     for (let i = 0; i < this.totalAction; i++) {
       this.positionsActionX.push(i * 68 + this.startPosition.x);
@@ -160,21 +154,17 @@ class ActionPoints {
       this.nC.addChild(this.inactiveActions[i], 0, widgetHeight, 1, 1);
     }
     //-------------------------
-    this.decrement = new ImageButton().setImage("minus.png");
-    this.decrement.setImageSize(100);
-    this.nC.addChild(this.decrement, 390, 90, 60, 60);
+    CreatePlusMinusButton(this.nC,
+      {
+        plusF: () => {
+          t.value = ((t.quantityAction + t.changedValue) > t.maxAction && t.maxAction) || t.quantityAction + t.changedValue;
+        },
+        minusF: () => {
+          t.quantityAction = ((t.quantityAction - t.changedValue) < 0 && "0") || t.quantityAction - t.changedValue;
+          t.value = parseInt(t.quantityAction);
+        }
+      }, ["minus.png", "plus.png"], [new Vector(390, 5), new Vector(1490, 5)], 60);
     //-------------------------
-    this.increment = new ImageButton().setImage("plus.png");
-    this.increment.setImageSize(100);
-    this.nC.addChild(this.increment, 1490, 90, 60, 60);
-    //-------------------------
-    this.decrement.onClicked.add(function () {
-      t.quantityAction = ((t.quantityAction - t.changedValue) < 0 && "0") || t.quantityAction - t.changedValue;
-      t.value = parseInt(t.quantityAction);
-    });
-    this.increment.onClicked.add(function () {
-      t.value = ((t.quantityAction + t.changedValue) > t.maxAction && t.maxAction) || t.quantityAction + t.changedValue;
-    });
     this.backText.onClicked.add(() => {
       t.value = t.maxAction;
     });
