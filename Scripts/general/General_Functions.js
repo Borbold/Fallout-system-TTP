@@ -86,25 +86,21 @@ const TypeCharacteristic = {
 }
 module.exports.TypeCharacteristic = TypeCharacteristic
 //-----------------------------------------------------------------
-function PositionsFontUI(startX, i) { return startX - 0.005 * i; }
-module.exports.PositionsFontUI = PositionsFontUI;
-
 const TypeShow = {
   STANDART: 0,
   PROCENT: 1,
 }
 module.exports.TypeShow = TypeShow;
 
-function ChangeImageSlider(image, value, maxValue, position, text, parent, startX, type, multiply) {
+function ChangeImageSlider(image, value, maxValue, position, text, parent, type, height, multiply) {
   type = type || TypeShow.STANDART; multiply = multiply || 10;
   let procent = parseInt((100 * value) / maxValue);
-  image.width = procent * multiply || 1;
-  image.position = position.add(new Vector(0, PositionsFontUI(startX, image.width), 0));
+  let newWidth = procent * multiply || 1;
   if (TypeShow.STANDART == type)
     text.setText(value + "/" + maxValue);
   else if (TypeShow.PROCENT == type)
     text.setText(procent + "%");
-  parent.updateUI(image);
+  parent.updateChild(image, position.x, position.y, newWidth, height);
 }
 module.exports.ChangeImageSlider = ChangeImageSlider;
 //-----------------------------------------------------------------
@@ -198,3 +194,49 @@ function CheckPlayerColor(player, check) {
   }
 }
 module.exports.CheckPlayerColor = CheckPlayerColor;
+//-----------------------------------------------------------------
+function CreateNumberButton(boxTable, fontSize) {
+  let newButton = new Button().setText("1").setFont(GetTextFont()).setTextColor(GetTextColor()).setFontSize(fontSize || 40);
+  let boxIndex = 0;
+  newButton.onClicked.add(() => {
+    boxIndex++;
+    if (boxIndex >= boxTable.length) {
+      boxIndex = 0;
+    }
+    newButton.setText(boxTable[boxIndex]);
+  });
+  return newButton;
+}
+module.exports.CreateNumberButton = CreateNumberButton;
+//-----------------------------------------------------------------
+function IncreaseParametersItem(obj, snapPoint) {
+  let snapingObjectId;
+  if (snapPoint.snapsRotation()) {
+    let snapingObject = snapPoint.getParentObject();
+    if (snapingObject.ChangeValues) {
+      snapingObject.ChangeValues(obj.getName(), obj.getDescription().toLowerCase());
+      snapingObjectId = snapingObject.getId();
+    } else if (snapingObject.ChangeDispersedItems) {
+      snapingObject.ChangeDispersedItems(obj);
+      snapingObjectId = snapingObject.getId();
+    }
+  }
+  return snapingObjectId;
+}
+module.exports.IncreaseParametersItem = IncreaseParametersItem;
+
+function DecreaseParametersItem(obj, snapingObjectId) {
+  if (snapingObjectId) {
+    let snapingObject = world.getObjectById(snapingObjectId);
+    if (snapingObject.ChangeValues) {
+      snapingObject.ChangeValues(obj.getName(), obj.getDescription().toLowerCase(), true);
+      return;
+    } else if (snapingObject.ChangeDispersedItems) {
+      snapingObject.ChangeDispersedItems(obj, true);
+      return;
+    }
+  }
+  return snapingObjectId;
+}
+module.exports.DecreaseParametersItem = DecreaseParametersItem;
+//-----------------------------------------------------------------

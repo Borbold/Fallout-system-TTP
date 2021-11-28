@@ -1,5 +1,5 @@
 const { refObject, world } = require('@tabletop-playground/api');
-const { CreateCanvasElement } = require('./general/General_Functions.js');
+const { CreateCanvasElement, IncreaseParametersItem, DecreaseParametersItem } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 const zPosition = refObject.getExtent().z * 1.1;
 const widgetWidth = refObject.getExtent().y * 200;
@@ -10,34 +10,14 @@ refObject.onCreated.add(() => {
 })
 
 let snapingObjectId;
-refObject.onSnapped.add((o, _2, snapPoint) => {
-  if (snapPoint.snapsRotation()) {
-    let snapingObject = snapPoint.getParentObject();
-    if (snapingObject.ChangeValues) {
-      snapingObject.ChangeValues(o.getName(), o.getDescription().toLowerCase());
-      snapingObjectId = snapingObject.getId();
-      saveState();
-    } else if (snapingObject.ChangeDispersedItems) {
-      snapingObject.ChangeDispersedItems(o);
-      snapingObjectId = snapingObject.getId();
-      saveState();
-    }
-  }
+refObject.onSnapped.add((obj, _2, snapPoint) => {
+  snapingObjectId = IncreaseParametersItem(obj, snapPoint);
+  if (snapingObjectId) saveState();
 })
 
-refObject.onGrab.add((o) => {
-  if (snapingObjectId) {
-    let snapingObject = world.getObjectById(snapingObjectId);
-    if (snapingObject.ChangeValues) {
-      snapingObject.ChangeValues(o.getName(), o.getDescription().toLowerCase(), true);
-      snapingObjectId = 0;
-      saveState();
-    } else if (snapingObject.ChangeDispersedItems) {
-      snapingObject.ChangeDispersedItems(o, true);
-      snapingObjectId = 0;
-      saveState();
-    }
-  }
+refObject.onGrab.add((obj) => {
+  DecreaseParametersItem(obj, snapingObjectId);
+  if (!snapingObjectId) saveState();
 })
 //-----------------------------------------------------------------
 let itemsPurchased = [];
