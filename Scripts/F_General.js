@@ -84,7 +84,7 @@ class HelthPoints {
   set value(number) {
     this.helthValue = number;
     UI.ChangeImageSlider(
-      this.helth, number, this.maxHelthValue, this.startPosition, this.fontText, this.nC, UI.TypeShow.PROCENT, 60);
+      this.helth, number, this.maxHelthValue, this.startPosition, this.frontText, this.nC, UI.TypeShow.PROCENT, 60);
     if (!this.firstTime) saveState(); else this.firstTime = false;
     this.backText.setText(number + "/" + this.maxHelthValue + " max");
     figurePlate.SetValueH(number + "/" + this.maxHelthValue);
@@ -110,7 +110,7 @@ class HelthPoints {
       this.value = newMax;
     } else {
       UI.ChangeImageSlider(
-        this.helth, this.value, newMax, this.startPosition, this.fontText, this.nC, UI.TypeShow.PROCENT, 60);
+        this.helth, this.value, newMax, this.startPosition, this.frontText, this.nC, UI.TypeShow.PROCENT, 60);
       this.backText.setText(this.value + "/" + newMax + " max");
     }
   }

@@ -184,6 +184,25 @@ function DecreaseParametersItem(obj, snapingObjectId) {
 }
 module.exports.DecreaseParametersItem = DecreaseParametersItem;
 //-----------------------------------------------------------------
+function CreateBackUI(backA) {
+  if (backA) {
+    let back = new ImageWidget().setImage(backA.tex);
+    this.nC.addChild(back, backA.x, backA.y, backA.w, backA.h);
+  }
+}
+
+function ChangeValuesSlider(text, value, maxValue, type, multiply) {
+  type = type || this.TypeShow.STANDART;
+  this.multiply = multiply || 10;
+  this.procent = parseInt((100 * value) / maxValue);
+  if (text) {
+    if (this.TypeShow.STANDART == type)
+      text.setText(value + "/" + maxValue);
+    else if (this.TypeShow.PROCENT == type)
+      text.setText(this.procent + "%");
+  }
+}
+//-----------------------------------------------------------------
 class UI {
   constructor() {
     this.nameFont = this.GetTextFont();
@@ -218,31 +237,37 @@ class UI {
     PROCENT: 1,
   }
 
-  CreateImageSlider(parent, frontSlider, fText, backA) {
-    if (backA) {
-      let back = new ImageWidget().setImage(backA.tex);
-      parent.nC.addChild(back, backA.x, backA.y, backA.w, backA.h);
-    }
+  CreateImageSlider(parent, frontSlider, fText, backA, canvasA) {
+    CreateBackUI.call(parent, backA);
     //-------------------------
-    parent.nC.addChild(frontSlider.slider, parent.startPosition.x, parent.startPosition.y, frontSlider.w, frontSlider.h);
+    if (canvasA) {
+      //**Functionality for creating a slider with position changing
+      parent.nCS = new Canvas();
+      let nCUIS = this.CreateCanvasElement(parent.nCS, canvasA.pos, canvasA.w, canvasA.h);
+      parent.parent.attachUI(nCUIS);
+      parent.nCS.addChild(frontSlider.slider, 0, 0, canvasA.w, canvasA.h);
+    } else {
+      //**Functionality for creating a slider with width change
+      parent.nC.addChild(frontSlider.slider, parent.startPosition.x, parent.startPosition.y, frontSlider.w, frontSlider.h);
+    }
     //-------------------------
     if (fText) {
-      parent.fontText = new Text().setText(parent.Ex + "/" + parent.maxEx).setFont(this.nameFont).setTextColor(this.textColor).setFontSize(fText.fontSize || 40);
-      parent.nC.addChild(parent.fontText, fText.x, fText.y, fText.w, fText.h);
+      parent.frontText = new Text().setText(parent.Ex + "/" + parent.maxEx).setFont(this.nameFont).setTextColor(this.textColor).setFontSize(fText.fontSize || 40);
+      if (parent.nCS) parent.nCS.addChild(parent.frontText, fText.x, fText.y, fText.w, fText.h);
+      else parent.nC.addChild(parent.frontText, fText.x, fText.y, fText.w, fText.h);
     }
   }
-
+  //**Functionality for change a slider with width change
   ChangeImageSlider(image, value, maxValue, position, text, parent, type, height, multiply) {
-    type = type || this.TypeShow.STANDART; multiply = multiply || 10;
-    let procent = parseInt((100 * value) / maxValue);
-    let newWidth = procent * multiply || 1;
-    if (text) {
-      if (this.TypeShow.STANDART == type)
-        text.setText(value + "/" + maxValue);
-      else if (this.TypeShow.PROCENT == type)
-        text.setText(procent + "%");
-    }
+    ChangeValuesSlider.call(this, text, value, maxValue, type, multiply);
+    let newWidth = this.procent * this.multiply || 1;
     parent.updateChild(image, position.x, position.y, newWidth, height);
+  }
+  //**Functionality for change a slider with position changing
+  ChangeMaskSlider(image, value, maxValue, position, text, parent, type, size, multiply) {
+    ChangeValuesSlider.call(this, text, value, maxValue, type, multiply);
+    let newPosX = (this.procent * this.multiply) || 1;
+    parent.updateChild(image, position.x + newPosX, position.y, size.width, size.height);
   }
   //-------------------------
   CreateCanvasElement(nC, position, widgetWidth, widgetHeight) {
