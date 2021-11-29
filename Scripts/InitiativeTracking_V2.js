@@ -53,6 +53,14 @@ class InitiativeTracker {
             value = characterNames[j];
             characterNames[j] = characterNames[j + 1];
             characterNames[j + 1] = value;
+
+            value = characterColor[j];
+            characterColor[j] = characterColor[j + 1];
+            characterColor[j + 1] = value;
+
+            value = initiativeBonus[j];
+            initiativeBonus[j] = initiativeBonus[j + 1];
+            initiativeBonus[j + 1] = value;
           }
         }
       }
