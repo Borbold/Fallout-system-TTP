@@ -1,6 +1,5 @@
 ﻿const { refObject, world } = require('@tabletop-playground/api');
-const { ChangeImageSlider, SetCurrentLevel, CreateCanvasElement, GetTextFont, GetTextColor, CheckPlayerColor,
-  CreateNumberButton, CreatePlusMinusButton, CreateImageSlider } = require('./general/General_Functions.js');
+const { SetCurrentLevel, CheckPlayerColor, UI } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   loadState();
@@ -9,8 +8,8 @@ refObject.onCreated.add(() => {
 const zPosition = 0.05;
 const widgetWidth = 1600;
 const widgetHeight = 400;
-let nameFont = GetTextFont();
-let textColor = GetTextColor();
+let nameFont = UI.GetTextFont();
+let textColor = UI.GetTextColor();
 //-----------------------------------------------------------------
 class LevelBox {
   constructor(parent, position) {
@@ -21,46 +20,51 @@ class LevelBox {
     this.startPosition = new Vector(110, widgetHeight - 90);
     //--Experience-----------------------
     this.nC = new Canvas();
-    let nCUI = CreateCanvasElement(this.nC, position, widgetWidth, widgetHeight);
+    let nCUI = UI.CreateCanvasElement(this.nC, position, widgetWidth, widgetHeight);
     parent.attachUI(nCUI);
     //-------------------------
-    this.changedButton = CreateNumberButton([1, 5, 10, 25, 50, 100]);
+    this.changedButton = UI.CreateNumberButton([1, 5, 10, 25, 50, 100]);
     this.nC.addChild(this.changedButton, 440, 145, 100, 80);
     //-------------------------
-    CreatePlusMinusButton(this.nC,
-      { plusF: () => {
-        t.valueExperience += t.changedValueE;
-        if (!t.firstTime) saveState(); else t.firstTime = false;
-      },
-        minusF: () => {
-        t.valueExperience -= t.changedValueE;
-        if (!t.firstTime) saveState(); else t.firstTime = false;
-        }
-      }, ["minus.png", "plus.png"], [new Vector(15, 305), new Vector(1505, 305)], 80);
+    UI.CreatePlusMinusButton(this.nC,
+    {
+      func: () => {
+        this.valueExperience += this.changedValueE;
+        if (!this.firstTime) saveState(); else this.firstTime = false;
+      }, x: 1505, y: 305, tex: "plus.png"
+    },
+    {
+      func: () => {
+        this.valueExperience -= this.changedValueE;
+        if (!this.firstTime) saveState(); else this.firstTime = false;
+      }, x: 15, y: 305, tex: "minus.png"
+    }, 80);
     //-------------------------
     this.experienceSlider = new ImageWidget().setImage("barline1.png");
-    CreateImageSlider(this,
-      { slider: t.experienceSlider, w: 60, h: 80 },
-      { fontSize: 40, x: t.startPosition.x + 630, y: t.startPosition.y + 15, w: 200, h: 60 },
-      { tex: "bar1.png", pos: new Vector(100, 310), w: 1400, h: 80 });
+    UI.CreateImageSlider(this,
+      { slider: this.experienceSlider, w: 60, h: 80 },
+      { fontSize: 40, x: this.startPosition.x + 630, y: this.startPosition.y + 15, w: 200, h: 60 },
+      { tex: "bar1.png", x: 100, y: 310, w: 1400, h: 80 });
     //--Level-----------------------
     this.textLevel = new Text().setText("1").setFont(nameFont).setEnabled(false).setTextColor(textColor);
     this.textLevel.setFontSize(50);
     this.nC.addChild(this.textLevel, 460, 50, 100, 80);
     //-------------------------
-    CreatePlusMinusButton(this.nC,
+    UI.CreatePlusMinusButton(this.nC,
       {
-        plusF: () => {
-          t.valueLevel += 1;
+        func: () => {
+          this.valueLevel += 1;
           saveState();
-        },
-        minusF: () => {
-          if (t.valueLevel > 1) {
-            t.valueLevel -= 1;
+        }, x: 540, y: 50, tex: "plus.png"
+      },
+      {
+        func: () => {
+          if (this.valueLevel > 1) {
+            this.valueLevel -= 1;
             saveState();
           }
-        }
-      }, ["minus.png", "plus.png"], [new Vector(360, 50), new Vector(540, 50)], 80);
+        }, x: 360, y: 50, tex: "minus.png"
+      }, 80);
     //--Reset-----------------------
     let resetButton = new ImageButton().setImage("resetl1.png");
     resetButton.setImageSize(200);
@@ -99,14 +103,14 @@ class LevelBox {
     } else if (this.Ex < 0) {
       this.Ex = 0;
     }
-    ChangeImageSlider(
+    UI.ChangeImageSlider(
       this.experienceSlider, this.Ex, this.maxEx, this.startPosition, this.fontText, this.nC, null, 80, 14);
   }
 
   SetMaxEx(value, resetEx) {
     this.Ex = !resetEx && this.Ex || 0;
     this.maxEx = value;
-    ChangeImageSlider(
+    UI.ChangeImageSlider(
       this.experienceSlider, this.Ex, this.maxEx, this.startPosition, this.fontText, this.nC, null, 80, 14);
   }
 }

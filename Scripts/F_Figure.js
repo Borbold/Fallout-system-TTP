@@ -1,5 +1,5 @@
 const { refObject } = require('@tabletop-playground/api');
-const { CreateCanvasElement, GetTextFont, GetTextColor } = require('./general/General_Functions.js');
+const { UI } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 let snapPointVector, grabbed = false;
 refObject.onSnapped.add((o, _2, point) => {
@@ -28,8 +28,8 @@ const zPosition = 5.1;
 const widgetWidth = 400;
 const offsetPlateY = 100;
 const widgetHeight = 300 + offsetPlateY;
-const nameFont = GetTextFont();
-const textColor = GetTextColor();
+const nameFont = UI.GetTextFont();
+const textColor = UI.GetTextColor();
 //-----------------------------------------------------------------
 class MainInfo {
   constructor(parent, position, isNPC) {
@@ -43,7 +43,7 @@ class MainInfo {
     let offsetX = 140, offsetY = 50;
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position.add(new Vector(-0.6, 0, 0.45)), widgetWidth, widgetHeight);
+    this.nCUI = UI.CreateCanvasElement(nC, position.add(new Vector(-0.6, 0, 0.45)), widgetWidth, widgetHeight);
     this.nCUI.rotation = new Rotator(-65, 0, 180);
     parent.attachUI(this.nCUI);
     //-------------------------
@@ -195,7 +195,7 @@ class Settings {
     let offsetX = 120, offsetY = 50;
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position.add(new Vector(-0.7, 0, 0.45)), widgetWidth, widgetHeight);
+    this.nCUI = UI.CreateCanvasElement(nC, position.add(new Vector(-0.7, 0, 0.45)), widgetWidth, widgetHeight);
     this.nCUI.scale = 0.01;
     this.nCUI.rotation = new Rotator(-65, 0, 180);
     parent.attachUI(this.nCUI);
@@ -289,7 +289,7 @@ class BonusInfo {
     this.parent = parent;
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position.add(new Vector(-0.7, 0, 0.45)), widgetWidth, widgetHeight);
+    this.nCUI = UI.CreateCanvasElement(nC, position.add(new Vector(-0.7, 0, 0.45)), widgetWidth, widgetHeight);
     this.nCUI.scale = 0.01;
     this.nCUI.rotation = new Rotator(-65, 0, 180);
     parent.attachUI(this.nCUI);

@@ -1,5 +1,5 @@
 const { refObject, world } = require('@tabletop-playground/api');
-const { CreateCanvasElement, GetTextFont, GetTextColor } = require('./general/General_Functions.js');
+const { UI } = require('./general/General_Functions.js');
 // Создание контейнера
 //world.createObjectFromTemplate("4FAE907E424F76032216F4B2200F27CD", refObject.getPosition().add(new Vector(20, 0, 0)));
 //-----------------------------------------------------------------
@@ -7,8 +7,8 @@ const zPosition = refObject.getExtent().z * 1.05;
 const widgetWidth = 4000;
 const offsetPlateY = 200;
 const widgetHeight = 2000 + offsetPlateY;
-const nameFont = GetTextFont();
-const textColor = GetTextColor();
+const nameFont = UI.GetTextFont();
+const textColor = UI.GetTextColor();
 //-----------------------------------------------------------------
 let dispersedItems = [];
 let pounches = [], namedStores = [];
@@ -20,7 +20,7 @@ class Store {
     this.startText = "\t Group stores";
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
+    this.nCUI = UI.CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
     this.nCUI.rotation = new Rotator(0, 0, 0);
     parent.attachUI(this.nCUI);
     //-------------------------

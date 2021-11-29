@@ -1,5 +1,5 @@
 ﻿const { refObject, world } = require('@tabletop-playground/api');
-const { CreateCanvasElement, GetTextFont, GetTextColor } = require('./general/General_Functions.js');
+const { UI } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   loadState();
@@ -9,8 +9,8 @@ const zPosition = refObject.getExtent().z * 1.15;
 const widgetWidth = refObject.getExtent().x * 200;
 const offsetPlateY = 200;
 const widgetHeight = refObject.getExtent().y * 200 + offsetPlateY;
-const nameFont = GetTextFont();
-const textColor = GetTextColor();
+const nameFont = UI.GetTextFont();
+const textColor = UI.GetTextColor();
 //-----------------------------------------------------------------
 let whoseMove = 0;
 let characterNames = "Kel\nMur\nKar\nKar1\nKar2\nKar3\nKar4", countCharacter = 7;
@@ -20,7 +20,7 @@ class InitiativeTracker {
     this.parent = parent;
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
+    this.nCUI = UI.CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
     this.nCUI.rotation = new Rotator(0, 90, 0);
     parent.attachUI(this.nCUI);
     //-------------------------

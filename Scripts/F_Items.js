@@ -1,5 +1,5 @@
 const { refObject, world } = require('@tabletop-playground/api');
-const { CreateCanvasElement, IncreaseParametersItem, DecreaseParametersItem } = require('./general/General_Functions.js');
+const { UI, IncreaseParametersItem, DecreaseParametersItem } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 const zPosition = refObject.getExtent().z * 1.1;
 const widgetWidth = refObject.getExtent().y * 200;
@@ -38,7 +38,7 @@ class BuyItem {
     this.startPosition = new Vector(0, 0, zPosition);
     //-------------------------
     this.nC = new Canvas();
-    this.nCUI = CreateCanvasElement(this.nC, position, widgetWidth, widgetHeight);
+    this.nCUI = UI.CreateCanvasElement(this.nC, position, widgetWidth, widgetHeight);
     this.nCUI.rotation = new Rotator(0, 0, 0);
     parent.attachUI(this.nCUI);
     //-------------------------

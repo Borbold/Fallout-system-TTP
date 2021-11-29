@@ -1,5 +1,5 @@
 const { refObject } = require('@tabletop-playground/api');
-const { ChangeImageSlider, TypeShow, CreateCanvasElement, GetTextFont, GetTextColor, CreateNumberButton, CreatePlusMinusButton, CreateImageSlider } = require('./general/General_Functions.js');
+const { UI } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 let figurePlate;
 refObject.onCreated.add(() => {
@@ -27,8 +27,8 @@ refObject.onCreated.add(() => {
 const zPosition = 0.1;
 const widgetWidth = 1600;
 const widgetHeight = 500;
-let nameFont = GetTextFont();
-let textColor = GetTextColor();
+let nameFont = UI.GetTextFont();
+let textColor = UI.GetTextColor();
 //-----------------------------------------------------------------
 class HelthPoints {
   firstTime = true;
@@ -39,30 +39,32 @@ class HelthPoints {
     this.startPosition = new Vector(470, 90);
     //-------------------------
     this.nC = new Canvas();
-    let nCUI = CreateCanvasElement(this.nC, position.add(new Vector(-1.25, 0, 0)), widgetWidth, widgetHeight / 2);
+    let nCUI = UI.CreateCanvasElement(this.nC, position.add(new Vector(-1.25, 0, 0)), widgetWidth, widgetHeight / 2);
     parent.attachUI(nCUI);
     //-------------------------
-    this.changedButton = CreateNumberButton([1, 5, 10, 25, 50, 100]);
+    this.changedButton = UI.CreateNumberButton([1, 5, 10, 25, 50, 100]);
     this.nC.addChild(this.changedButton, 440, 180, 100, 80);
     //-------------------------
     this.backText = new Button().setText(this.helthValue + "/" + this.maxHelthValue + " max").setFont(nameFont).setTextColor(textColor);
     this.backText.setFontSize(40);
     this.nC.addChild(this.backText, 15, 180, 350, 80);
     //-------------------------
-    CreatePlusMinusButton(this.nC,
+    UI.CreatePlusMinusButton(this.nC,
       {
-        plusF: () => {
-          t.IncreaseValue();
-        },
-        minusF: () => {
-          t.DecreaseValue();
-        }
-      }, ["minus.png", "plus.png"], [new Vector(390, 90), new Vector(1490, 90)], 60);
+        func: () => {
+          this.IncreaseValue();
+        }, x: 1490, y: 90, tex: "plus.png"
+      },
+      {
+        func: () => {
+          this.DecreaseValue();
+        }, x: 390, y: 90, tex: "minus.png"
+      }, 60);
     //-------------------------
     this.helth = new ImageWidget().setImage("barline1.png");
-    CreateImageSlider(this,
-      { slider: t.helth, w: 60, h: 80 },
-      { fontSize: 40, x: t.startPosition.x + 450, y: t.startPosition.y + 5, w: 110, h: 60 });
+    UI.CreateImageSlider(this,
+      { slider: this.helth, w: 60, h: 80 },
+      { fontSize: 40, x: this.startPosition.x + 450, y: this.startPosition.y + 5, w: 110, h: 60 });
     //-------------------------
     this.backText.onClicked.add(() => {
       t.value = t.maxHelthValue;
@@ -81,8 +83,8 @@ class HelthPoints {
   get value() { return this.helthValue; }
   set value(number) {
     this.helthValue = number;
-    ChangeImageSlider(
-      this.helth, number, this.maxHelthValue, this.startPosition, this.fontText, this.nC, TypeShow.PROCENT, 60);
+    UI.ChangeImageSlider(
+      this.helth, number, this.maxHelthValue, this.startPosition, this.fontText, this.nC, UI.TypeShow.PROCENT, 60);
     if (!this.firstTime) saveState(); else this.firstTime = false;
     this.backText.setText(number + "/" + this.maxHelthValue + " max");
     figurePlate.SetValueH(number + "/" + this.maxHelthValue);
@@ -107,8 +109,8 @@ class HelthPoints {
     if (this.value > newMax) {
       this.value = newMax;
     } else {
-      ChangeImageSlider(
-        this.helth, this.value, newMax, this.startPosition, this.fontText, this.nC, TypeShow.PROCENT, 60);
+      UI.ChangeImageSlider(
+        this.helth, this.value, newMax, this.startPosition, this.fontText, this.nC, UI.TypeShow.PROCENT, 60);
       this.backText.setText(this.value + "/" + newMax + " max");
     }
   }
@@ -132,10 +134,10 @@ class ActionPoints {
     this.startPosition = new Vector(458, 0);
     //-------------------------
     this.nC = new Canvas();
-    let nCUI = CreateCanvasElement(this.nC, position.add(new Vector(1.46, 0, 0)), widgetWidth, widgetHeight / 2);
+    let nCUI = UI.CreateCanvasElement(this.nC, position.add(new Vector(1.46, 0, 0)), widgetWidth, widgetHeight / 2);
     parent.attachUI(nCUI);
     //-------------------------
-    this.changedButton = CreateNumberButton([1, 2, 4]);
+    this.changedButton = UI.CreateNumberButton([1, 2, 4]);
     this.nC.addChild(this.changedButton, 440, 100, 100, 80);
     //-------------------------
     this.backText = new Button().setText(this.quantityAction + "/" + this.maxAction + " max").setFont(nameFont).setTextColor(textColor);
@@ -154,16 +156,18 @@ class ActionPoints {
       this.nC.addChild(this.inactiveActions[i], 0, widgetHeight, 1, 1);
     }
     //-------------------------
-    CreatePlusMinusButton(this.nC,
+    UI.CreatePlusMinusButton(this.nC,
       {
-        plusF: () => {
+        func: () => {
           t.value = ((t.quantityAction + t.changedValue) > t.maxAction && t.maxAction) || t.quantityAction + t.changedValue;
-        },
-        minusF: () => {
+        }, x: 1490, y: 5, tex: "plus.png"
+      },
+      {
+        func: () => {
           t.quantityAction = ((t.quantityAction - t.changedValue) < 0 && "0") || t.quantityAction - t.changedValue;
           t.value = parseInt(t.quantityAction);
-        }
-      }, ["minus.png", "plus.png"], [new Vector(390, 5), new Vector(1490, 5)], 60);
+        }, x: 390, y: 5, tex: "minus.png"
+      }, 60);
     //-------------------------
     this.backText.onClicked.add(() => {
       t.value = t.maxAction;

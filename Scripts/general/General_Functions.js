@@ -1,7 +1,5 @@
 const { world } = require('@tabletop-playground/api');
 let idObjects = [], ids = [];
-let nameFont = GetTextFont();
-let textColor = GetTextColor();
 //-----------------------------------------------------------------
 function SetIdObject(name, id) {
   idObjects[name + id] = id;
@@ -86,62 +84,7 @@ const TypeCharacteristic = {
   dextery: 5,
   luck: 6
 }
-module.exports.TypeCharacteristic = TypeCharacteristic
-//-----------------------------------------------------------------
-const TypeShow = {
-  STANDART: 0,
-  PROCENT: 1,
-}
-module.exports.TypeShow = TypeShow;
-
-function CreateImageSlider(parent, frontSlider, fText, backA) {
-  if (backA) {
-    let back = new ImageWidget().setImage(backA.tex);
-    parent.nC.addChild(back, backA.pos.x, backA.pos.y, backA.w, backA.h);
-  }
-  //-------------------------
-  parent.nC.addChild(frontSlider.slider, parent.startPosition.x, parent.startPosition.y, frontSlider.w, frontSlider.h);
-  //-------------------------
-  parent.fontText = new Text().setText(parent.Ex + "/" + parent.maxEx).setFont(nameFont).setTextColor(textColor).setFontSize(fText.fontSize || 40);
-  parent.nC.addChild(parent.fontText, fText.x, fText.y, fText.w, fText.h);
-}
-module.exports.CreateImageSlider = CreateImageSlider;
-
-function ChangeImageSlider(image, value, maxValue, position, text, parent, type, height, multiply) {
-  type = type || TypeShow.STANDART; multiply = multiply || 10;
-  let procent = parseInt((100 * value) / maxValue);
-  let newWidth = procent * multiply || 1;
-  if (TypeShow.STANDART == type)
-    text.setText(value + "/" + maxValue);
-  else if (TypeShow.PROCENT == type)
-    text.setText(procent + "%");
-  parent.updateChild(image, position.x, position.y, newWidth, height);
-}
-module.exports.ChangeImageSlider = ChangeImageSlider;
-//-----------------------------------------------------------------
-function CreateCanvasElement(nC, position, widgetWidth, widgetHeight) {
-  let nCUI = new UIElement();
-  nCUI.useWidgetSize = false;
-  nCUI.position = position;
-  nCUI.rotation = new Rotator(0, 0, 180);
-  if (nC) {
-    nCUI.widget = nC;
-  }
-  nCUI.width = widgetWidth;
-  nCUI.height = widgetHeight;
-  nCUI.scale = 0.1;
-  return nCUI;
-}
-module.exports.CreateCanvasElement = CreateCanvasElement;
-//-----------------------------------------------------------------
-function GetTextFont() {
-  return "Fallout.ttf";
-}
-module.exports.GetTextFont = GetTextFont;
-function GetTextColor() {
-  return new Color(1, 0.71, 0.25);
-}
-module.exports.GetTextColor = GetTextColor;
+module.exports.TypeCharacteristic = TypeCharacteristic;
 //-----------------------------------------------------------------
 function CalculateConditionValue(conditionValueMain, plate, wordCheck) {
   let conditionMain = 0;
@@ -210,20 +153,6 @@ function CheckPlayerColor(player, check) {
 }
 module.exports.CheckPlayerColor = CheckPlayerColor;
 //-----------------------------------------------------------------
-function CreateNumberButton(boxTable, fontSize) {
-  let newButton = new Button().setText("1").setFont(nameFont).setTextColor(textColor).setFontSize(fontSize || 40);
-  let boxIndex = 0;
-  newButton.onClicked.add(() => {
-    boxIndex++;
-    if (boxIndex >= boxTable.length) {
-      boxIndex = 0;
-    }
-    newButton.setText(boxTable[boxIndex]);
-  });
-  return newButton;
-}
-module.exports.CreateNumberButton = CreateNumberButton;
-//-----------------------------------------------------------------
 function IncreaseParametersItem(obj, snapPoint) {
   let snapingObjectId;
   if (snapPoint.snapsRotation()) {
@@ -255,14 +184,84 @@ function DecreaseParametersItem(obj, snapingObjectId) {
 }
 module.exports.DecreaseParametersItem = DecreaseParametersItem;
 //-----------------------------------------------------------------
-function CreatePlusMinusButton(parent, func, png, pos, size) {
-  let decrementL = new ImageButton().setImage(png[0]).setImageSize(100);
-  parent.addChild(decrementL, pos[0].x, pos[0].y, size, size);
-  decrementL.onClicked.add(func.minusF);
+class UI {
+  constructor() {
+    this.nameFont = this.GetTextFont();
+    this.textColor = this.GetTextColor();
+  }
+
+  CreatePlusMinusButton(parent, plusF, minusF, size) {
+    let incrementL = new ImageButton().setImage(plusF.tex).setImageSize(100);
+    parent.addChild(incrementL, plusF.x, plusF.y, size, size);
+    incrementL.onClicked.add(plusF.func);
+    //-------------------------
+    let decrementL = new ImageButton().setImage(minusF.tex).setImageSize(100);
+    parent.addChild(decrementL, minusF.x, minusF.y, size, size);
+    decrementL.onClicked.add(minusF.func);
+  }
   //-------------------------
-  let incrementL = new ImageButton().setImage(png[1]).setImageSize(100);
-  parent.addChild(incrementL, pos[1].x, pos[1].y, size, size);
-  incrementL.onClicked.add(func.plusF);
+  CreateNumberButton(boxTable, fontSize) {
+    let newButton = new Button().setText("1").setFont(this.nameFont).setTextColor(this.textColor).setFontSize(fontSize || 40);
+    let boxIndex = 0;
+    newButton.onClicked.add(() => {
+      boxIndex++;
+      if (boxIndex >= boxTable.length) {
+        boxIndex = 0;
+      }
+      newButton.setText(boxTable[boxIndex]);
+    });
+    return newButton;
+  }
+  //-------------------------
+  TypeShow = {
+    STANDART: 0,
+    PROCENT: 1,
+  }
+
+  CreateImageSlider(parent, frontSlider, fText, backA) {
+    if (backA) {
+      let back = new ImageWidget().setImage(backA.tex);
+      parent.nC.addChild(back, backA.x, backA.y, backA.w, backA.h);
+    }
+    //-------------------------
+    parent.nC.addChild(frontSlider.slider, parent.startPosition.x, parent.startPosition.y, frontSlider.w, frontSlider.h);
+    //-------------------------
+    parent.fontText = new Text().setText(parent.Ex + "/" + parent.maxEx).setFont(this.nameFont).setTextColor(this.textColor).setFontSize(fText.fontSize || 40);
+    parent.nC.addChild(parent.fontText, fText.x, fText.y, fText.w, fText.h);
+  }
+
+  ChangeImageSlider(image, value, maxValue, position, text, parent, type, height, multiply) {
+    type = type || this.TypeShow.STANDART; multiply = multiply || 10;
+    let procent = parseInt((100 * value) / maxValue);
+    let newWidth = procent * multiply || 1;
+    if (this.TypeShow.STANDART == type)
+      text.setText(value + "/" + maxValue);
+    else if (this.TypeShow.PROCENT == type)
+      text.setText(procent + "%");
+    parent.updateChild(image, position.x, position.y, newWidth, height);
+  }
+  //-------------------------
+  CreateCanvasElement(nC, position, widgetWidth, widgetHeight) {
+    let nCUI = new UIElement();
+    nCUI.useWidgetSize = false;
+    nCUI.position = position;
+    nCUI.rotation = new Rotator(0, 0, 180);
+    if (nC) {
+      nCUI.widget = nC;
+    }
+    nCUI.width = widgetWidth;
+    nCUI.height = widgetHeight;
+    nCUI.scale = 0.1;
+    return nCUI;
+  }
+  //-------------------------
+  GetTextFont() {
+    let _ = new Text().setFont("Fallout.ttf");
+    return "Fallout.ttf";
+  }
+  GetTextColor() {
+    return new Color(1, 0.71, 0.25);
+  }
 }
-module.exports.CreatePlusMinusButton = CreatePlusMinusButton;
-//-----------------------------------------------------------------
+let ui = new UI();
+module.exports.UI = ui;

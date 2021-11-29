@@ -1,5 +1,5 @@
 const { refObject } = require('@tabletop-playground/api');
-const { CreateCanvasElement, GetTextFont, GetTextColor } = require('./general/General_Functions.js');
+const { UI } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 let snapingObjectId;
 refObject.onSnapped.add((_1, _2, snapPoint) => {
@@ -25,8 +25,8 @@ refObject.onGrab.add(() => {
 const zPosition = refObject.getExtent().z + 0.05;
 const widgetWidth = 200;
 const widgetHeight = 200;
-const nameFont = GetTextFont();
-const textColor = GetTextColor();
+const nameFont = UI.GetTextFont();
+const textColor = UI.GetTextColor();
 //-----------------------------------------------------------------
 let countCaps;
 class Wallet {
@@ -37,7 +37,7 @@ class Wallet {
     this.parent = parent;
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
+    this.nCUI = UI.CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
     this.nCUI.rotation = new Rotator(0, 0, 0);
     parent.attachUI(this.nCUI);
     //-------------------------
@@ -49,7 +49,7 @@ class Wallet {
     })
     //-------------------------
     let nCInfo = new Canvas();
-    this.nCUIInfo = CreateCanvasElement(nCInfo, this.hidePos, widgetWidth, widgetHeight);
+    this.nCUIInfo = UI.CreateCanvasElement(nCInfo, this.hidePos, widgetWidth, widgetHeight);
     this.nCUIInfo.rotation = new Rotator(0, 0, 0);
     parent.attachUI(this.nCUIInfo);
     //-------------------------

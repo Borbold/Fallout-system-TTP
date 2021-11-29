@@ -1,5 +1,5 @@
 const { refObject } = require('@tabletop-playground/api');
-const { SetIdObject, TypeCharacteristic, CreateCanvasElement, GetTextFont, GetTextColor, CalculateConditionValue } = require('./general/General_Functions.js');
+const { SetIdObject, TypeCharacteristic, UI, CalculateConditionValue } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   SetIdObject(refObject.getName(), refObject.getId());
@@ -9,8 +9,8 @@ refObject.onCreated.add(() => {
 const zPosition = 0.1;
 const widgetWidth = 1600;
 const widgetHeight = 800;
-let nameFont = GetTextFont();
-let textColor = GetTextColor();
+let nameFont = UI.GetTextFont();
+let textColor = UI.GetTextColor();
 //-----------------------------------------------------------------
 const countStatus = 6;
 let allStatus = [], statusValue = [];
@@ -177,7 +177,7 @@ class Status {
     this.hidePosition = backUIPos.add(new Vector(0, 0, -zPosition));
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, backUIPos, widgetWidth / 2, widgetHeight);
+    this.nCUI = UI.CreateCanvasElement(nC, backUIPos, widgetWidth / 2, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
     let maxStatus = new Text().setText("/1000").setFont(nameFont).setTextColor(textColor);
@@ -208,7 +208,7 @@ class Status2 {
     this.hidePosition = backUIPos.add(new Vector(0, 0, -zPosition));
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, backUIPos, widgetWidth / 2, widgetHeight);
+    this.nCUI = UI.CreateCanvasElement(nC, backUIPos, widgetWidth / 2, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
     let borderBaff = new Border();
@@ -266,7 +266,7 @@ class LimbCondition {
     this.hidePosition = position;
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
+    this.nCUI = UI.CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
     let image = new ImageWidget().setImage("konechnosti2.png");

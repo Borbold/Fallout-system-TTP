@@ -1,5 +1,5 @@
 const { refObject, world } = require('@tabletop-playground/api');
-const { SetIdObject, TypeCharacteristic, CreateCanvasElement, GetTextFont, GetTextColor, CalculateConditionValue } = require('./general/General_Functions.js');
+const { SetIdObject, TypeCharacteristic, UI, CalculateConditionValue } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   SetIdObject(refObject.getName(), refObject.getId());
@@ -8,8 +8,8 @@ refObject.onCreated.add(() => {
 const zPosition = 0.1;
 const widgetWidth = refObject.getExtent().y * 200;
 const widgetHeight = refObject.getExtent().x * 200;
-let nameFont = GetTextFont();
-let textColor = GetTextColor();
+let nameFont = UI.GetTextFont();
+let textColor = UI.GetTextColor();
 //-----------------------------------------------------------------
 let selectedSkills = [], countSelected = 0;
 const countSkills = 19;
@@ -132,7 +132,7 @@ class SkillsMajor {
     this.freeSPValue = 0;
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position.add(new Vector(0.1, 0, 0)), widgetWidth, widgetHeight);
+    this.nCUI = UI.CreateCanvasElement(nC, position.add(new Vector(0.1, 0, 0)), widgetWidth, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
     let offsetY = 0; let offsetX = 440; let offsetButtonX = 30;
@@ -212,7 +212,7 @@ class SkillsChanger {
     this.hidePosition = position;
     //-------------------------
     let nC = new Canvas();
-    this.nCUI = CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
+    this.nCUI = UI.CreateCanvasElement(nC, position, widgetWidth, widgetHeight);
     parent.attachUI(this.nCUI);
     //-------------------------
     let offsetY = 0; let offsetX = 500;
