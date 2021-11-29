@@ -226,18 +226,22 @@ class UI {
     //-------------------------
     parent.nC.addChild(frontSlider.slider, parent.startPosition.x, parent.startPosition.y, frontSlider.w, frontSlider.h);
     //-------------------------
-    parent.fontText = new Text().setText(parent.Ex + "/" + parent.maxEx).setFont(this.nameFont).setTextColor(this.textColor).setFontSize(fText.fontSize || 40);
-    parent.nC.addChild(parent.fontText, fText.x, fText.y, fText.w, fText.h);
+    if (fText) {
+      parent.fontText = new Text().setText(parent.Ex + "/" + parent.maxEx).setFont(this.nameFont).setTextColor(this.textColor).setFontSize(fText.fontSize || 40);
+      parent.nC.addChild(parent.fontText, fText.x, fText.y, fText.w, fText.h);
+    }
   }
 
   ChangeImageSlider(image, value, maxValue, position, text, parent, type, height, multiply) {
     type = type || this.TypeShow.STANDART; multiply = multiply || 10;
     let procent = parseInt((100 * value) / maxValue);
     let newWidth = procent * multiply || 1;
-    if (this.TypeShow.STANDART == type)
-      text.setText(value + "/" + maxValue);
-    else if (this.TypeShow.PROCENT == type)
-      text.setText(procent + "%");
+    if (text) {
+      if (this.TypeShow.STANDART == type)
+        text.setText(value + "/" + maxValue);
+      else if (this.TypeShow.PROCENT == type)
+        text.setText(procent + "%");
+    }
     parent.updateChild(image, position.x, position.y, newWidth, height);
   }
   //-------------------------
