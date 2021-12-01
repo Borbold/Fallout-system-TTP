@@ -202,7 +202,7 @@ function ChangeValuesSlider(text, value, maxValue, type, multiply) {
       text.setText(this.procent + "%");
   }
 }
-//-----------------------------------------------------------------
+
 class UI {
   constructor() {
     this.nameFont = this.GetTextFont();
