@@ -51,25 +51,33 @@ class MainInfo {
     borderMain.scale = 0.1;
     nC.addChild(borderMain, 0, offsetPlateY / 2, widgetWidth, widgetHeight - offsetPlateY);
     //-------------------------
-    this.decrementH = new ImageButton().setImage("minus.png");
-    this.decrementH.setImageSize(100);
-    nC.addChild(this.decrementH, centerX - offsetX, centerY - offsetY, localSize, localSize);
-    //-------------------------
-    this.incrementH = new ImageButton().setImage("plus.png");
-    this.incrementH.setImageSize(100);
-    nC.addChild(this.incrementH, centerX + offsetX, centerY - offsetY, localSize, localSize);
+    UI.CreatePlusMinusButton(nC,
+      {
+        func: () => {
+          this.HealthValue += settings.ChangedValueHealth;
+        }, x: centerX + offsetX, y: centerY - offsetY, tex: "plus.png"
+      },
+      {
+        func: () => {
+          this.HealthValue -= settings.ChangedValueHealth;
+        }, x: centerX - offsetX, y: centerY - offsetY, tex: "minus.png"
+      }, localSize);
     //-------------------------
     this.fontTextH = new Text().setText(mainValues && (mainValues["health"] + "/" + mainValues["healthMax"]) || "?").setTextColor(new Color(1, 0.3, 0.25)).setFont(nameFont);
     this.fontTextH.setFontSize(40);
     nC.addChild(this.fontTextH, centerX - 30, centerY - offsetY, 160, localSize);
     //-------------------------
-    this.decrementA = new ImageButton().setImage("minus.png");
-    this.decrementA.setImageSize(100);
-    nC.addChild(this.decrementA, centerX - offsetX, centerY + offsetY, localSize, localSize);
-    //-------------------------
-    this.incrementA = new ImageButton().setImage("plus.png");
-    this.incrementA.setImageSize(100);
-    nC.addChild(this.incrementA, centerX + offsetX, centerY + offsetY, localSize, localSize);
+    UI.CreatePlusMinusButton(nC,
+      {
+        func: () => {
+          this.ActionValue += settings.ChangedValueAction;
+        }, x: centerX + offsetX, y: centerY + offsetY, tex: "plus.png"
+      },
+      {
+        func: () => {
+          this.ActionValue -= settings.ChangedValueAction;
+        }, x: centerX - offsetX, y: centerY + offsetY, tex: "minus.png"
+      }, localSize);
     //-------------------------
     this.fontTextA = new Text().setText(mainValues && (mainValues["action"] + "/" + mainValues["actionMax"]) || "?").setTextColor(new Color(0.3, 1, 0.25)).setFont(nameFont);
     this.fontTextA.setFontSize(40);
@@ -86,50 +94,6 @@ class MainInfo {
         t.spendText.setTextColor(new Color(1, 0.1, 0));
       }
     })
-    //-------------------------
-    if (isNPC) {
-      this.decrementH.onClicked.add(function () {
-        t.HealthValue = t.HealthValue - settings.ChangedValueHealth > 0 && t.HealthValue - settings.ChangedValueHealth || "0";
-      });
-      this.incrementH.onClicked.add(function () {
-        t.HealthValue += settings.ChangedValueHealth;
-        t.HealthValue = t.HealthValue < mainValues["healthMax"] && t.HealthValue || mainValues["healthMax"];
-      });
-      //-------------------------
-      this.decrementA.onClicked.add(function () {
-        t.ActionValue = t.ActionValue - settings.ChangedValueAction > 0 && t.ActionValue - settings.ChangedValueAction || "0";
-      });
-      this.incrementA.onClicked.add(function () {
-        t.ActionValue += settings.ChangedValueAction;
-        t.ActionValue = t.ActionValue < mainValues["actionMax"] && t.ActionValue || mainValues["actionMax"];
-      });
-    } else {
-      this.decrementH.onClicked.add(function () {
-        if ((healthPlate.helthValue - healthPlate.changedValue) < 0) {
-          healthPlate.value = 0;
-        } else {
-          healthPlate.value = healthPlate.helthValue - healthPlate.changedValue;
-        }
-      });
-      this.incrementH.onClicked.add(function () {
-        if (healthPlate.helthValue + healthPlate.changedValue > healthPlate.maxHelthValue) {
-          healthPlate.value = healthPlate.maxHelthValue;
-        } else {
-          healthPlate.value = healthPlate.helthValue + healthPlate.changedValue;
-        }
-      });
-      //-------------------------
-      this.decrementA.onClicked.add(function () {
-        t.DecrementActionPoints(actionPlate.changedValue);
-      });
-      this.incrementA.onClicked.add(function () {
-        if (actionPlate.quantityAction + actionPlate.changedValue > actionPlate.maxAction) {
-          actionPlate.value = actionPlate.maxAction;
-        } else {
-          actionPlate.value = actionPlate.quantityAction + actionPlate.changedValue;
-        }
-      });
-    }
     //--Settings--Bonus---------------------
     if (isNPC) {
       let gear = new ImageButton().setImage("gear-icon.png");
@@ -162,12 +126,28 @@ class MainInfo {
 
   get HealthValue() { return parseInt(this.fontTextH.getText()); }
   set HealthValue(value) {
+    if (value > mainValues["healthMax"])
+      value = mainValues["healthMax"];
+    else if (value < 0)
+      value = 0;
+
+    if (healthPlate)
+      healthPlate.value = value;
+
     this.fontTextH.setText(value + "/" + mainValues["healthMax"]);
     saveState();
   }
 
   get ActionValue() { return parseInt(this.fontTextA.getText()); }
   set ActionValue(value) {
+    if (value > mainValues["actionMax"])
+      value = mainValues["actionMax"];
+    else if (value < 0)
+      value = 0;
+
+    if (actionPlate)
+      actionPlate.value = value;
+
     this.fontTextA.setText(value + "/" + mainValues["actionMax"]);
     saveState();
   }
@@ -264,11 +244,15 @@ class Settings {
     })
   }
 
-  get ChangedValueHealth() { return parseInt(this.changedValueHealth.getText()); }
-  set ChangedValueHealth(number) { this.changedValueHealth.setText(number); }
+  get ChangedValueHealth() {
+    if (healthPlate) return healthPlate.changedValue;
+    return parseInt(this.changedValueHealth.getText());
+  }
 
-  get ChangedValueAction() { return parseInt(this.changedValueAction.getText()); }
-  set ChangedValueAction(number) { this.changedValueAction.setText(number); }
+  get ChangedValueAction() {
+    if (actionPlate) return actionPlate.changedValue;
+    return parseInt(this.changedValueAction.getText());
+  }
 
   HideUI() {
     this.nCUI.scale = 0.01;
@@ -338,8 +322,11 @@ let healthPlate, actionPlate;
 refObject.SetHelthPlate = (plate1, plate2) => {
   healthPlate = plate1;
   mainInfo.fontTextH.setText(healthPlate.helthValue + "/" + healthPlate.maxHelthValue);
+  mainValues["healthMax"] = healthPlate.maxHelthValue;
+
   actionPlate = plate2;
   mainInfo.fontTextA.setText(actionPlate.quantityAction + "/" + actionPlate.maxAction);
+  mainValues["actionMax"] = actionPlate.maxAction;
 }
 
 refObject.SetValueH = (value) => { mainInfo.fontTextH.setText(value); }
@@ -371,20 +358,20 @@ refObject.ChangeNameBonus = (name, remove) => {
   saveState();
 }
 //-----------------------------------------------------------------
-let mainInfo, settings, bonusInfo;
+let mainInfo, bonusInfo;
 let mainValues = [];
 if (refObject.getTemplateMetadata() == "firgureNPC") {
   mainValues["health"] = "0"; mainValues["healthMax"] = "5";
   mainValues["action"] = "0"; mainValues["actionMax"] = "5";
   mainInfo = new MainInfo(refObject, new Vector(0, 0, zPosition), true);
   loadState();
-  settings = new Settings(refObject, new Vector(0, 0, zPosition));
 } else if (refObject.getTemplateMetadata() == "firgureCharacter") {
   mainInfo = new MainInfo(refObject, new Vector(0, 0, zPosition));
   bonusInfo = new BonusInfo(refObject, new Vector(0, 0, zPosition));
   loadState();
   bonusInfo.SetNamesBonus();
 }
+let settings = new Settings(refObject, new Vector(0, 0, zPosition));
 //-----------------------------------------------------------------
 function saveState() {
   let state = {};

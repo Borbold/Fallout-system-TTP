@@ -210,13 +210,13 @@ class UI {
   }
 
   CreatePlusMinusButton(parent, plusF, minusF, size) {
-    let incrementL = new ImageButton().setImage(plusF.tex).setImageSize(100);
-    parent.addChild(incrementL, plusF.x, plusF.y, size, size);
-    incrementL.onClicked.add(plusF.func);
+    let increment = new ImageButton().setImage(plusF.tex).setImageSize(100);
+    parent.addChild(increment, plusF.x, plusF.y, size, size);
+    increment.onClicked.add(plusF.func);
     //-------------------------
-    let decrementL = new ImageButton().setImage(minusF.tex).setImageSize(100);
-    parent.addChild(decrementL, minusF.x, minusF.y, size, size);
-    decrementL.onClicked.add(minusF.func);
+    let decrement = new ImageButton().setImage(minusF.tex).setImageSize(100);
+    parent.addChild(decrement, minusF.x, minusF.y, size, size);
+    decrement.onClicked.add(minusF.func);
   }
   //-------------------------
   CreateNumberButton(boxTable, fontSize) {
