@@ -54,7 +54,7 @@ class LevelBox {
         }, x: 15, y: 305, tex: "minus.png"
       }, 80);
     //--Level-----------------------
-    this.textLevel = new Text().setText("1").setFont(nameFont).setEnabled(false).setTextColor(textColor);
+    this.textLevel = new Text().setText("1").setFont(nameFont).setTextColor(textColor);
     this.textLevel.setFontSize(50);
     this.nC.addChild(this.textLevel, 460, 50, 100, 80);
     //-------------------------

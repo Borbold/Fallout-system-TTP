@@ -270,7 +270,8 @@ let arrayTextBonus = [], arrayDescriptionBonus = [];
 for (let i = 0; i < 20; i++) {
   let newButton = new Button().setFontSize(40).setTextColor(textColor).setFont(nameFont);
   arrayTextBonus.push(newButton);
-  let newDescription = new MultilineTextBox().setFontSize(30).setTextColor(new Color(.1, 1, .4)).setFont(nameFont);
+
+  let newDescription = new MultilineTextBox().setFontSize(30).setTextColor(new Color(.1, 1, .2)).setFont(nameFont);
   arrayDescriptionBonus.push(newDescription);
 }
 class BonusInfo {
