@@ -16,7 +16,7 @@ refObject.onSnapped.add((obj, _2, snapPoint) => {
 })
 
 refObject.onGrab.add((obj) => {
-  DecreaseParametersItem(obj, snapingObjectId);
+  snapingObjectId = DecreaseParametersItem(obj, snapingObjectId);
   if (!snapingObjectId) saveState();
 })
 //-----------------------------------------------------------------

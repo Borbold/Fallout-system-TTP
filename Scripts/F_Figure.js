@@ -26,7 +26,7 @@ refObject.onHit.add(() => {
 //-----------------------------------------------------------------
 const zPosition = 5.1;
 const widgetWidth = 400;
-const offsetPlateY = 100;
+const offsetPlateY = 500;
 const widgetHeight = 300 + offsetPlateY;
 const nameFont = UI.GetTextFont();
 const textColor = UI.GetTextColor();
@@ -97,14 +97,14 @@ class MainInfo {
     //--Settings--Bonus---------------------
     if (isNPC) {
       let gear = new ImageButton().setImage("gear-icon.png");
-      nC.addChild(gear, widgetWidth - 50, 0, 50, 50);
+      nC.addChild(gear, widgetWidth - 50, widgetHeight - offsetPlateY - 100, 50, 50);
       gear.onClicked.add(() => {
         settings.ShowUI();
         t.HideUI();
       })
     } else {
       let info = new ImageButton().setImage("info-icon.png");
-      nC.addChild(info, widgetWidth - 50, 0, 50, 50);
+      nC.addChild(info, widgetWidth - 50, widgetHeight - offsetPlateY - 100, 50, 50);
       info.onClicked.add(() => {
         bonusInfo.ShowUI();
         t.HideUI();
@@ -237,7 +237,7 @@ class Settings {
     })
     //-------------------------
     let cross = new ImageButton().setImage("cross-icon.png");
-    nC.addChild(cross, widgetWidth - 50, 0, 50, 50);
+    nC.addChild(cross, widgetWidth - 50, widgetHeight - offsetPlateY - 100, 50, 50);
     cross.onClicked.add(() => {
       mainInfo.ShowUI();
       t.HideUI();
@@ -266,28 +266,34 @@ class Settings {
   }
 }
 
+let arrayTextBonus = [], arrayDescriptionBonus = [];
+for (let i = 0; i < 20; i++) {
+  let newButton = new Button().setFontSize(40).setTextColor(textColor).setFont(nameFont);
+  arrayTextBonus.push(newButton);
+  let newDescription = new MultilineTextBox().setFontSize(30).setTextColor(new Color(.1, 1, .4)).setFont(nameFont);
+  arrayDescriptionBonus.push(newDescription);
+}
 class BonusInfo {
   constructor(parent, position) {
     let t = this;
     this.startPosition = position.add(new Vector(-0.7, 0, 0.45));
     this.parent = parent;
     //-------------------------
-    let nC = new Canvas();
-    this.nCUI = UI.CreateCanvasElement(nC, position.add(new Vector(-0.7, 0, 0.45)), widgetWidth, widgetHeight);
+    this.nC = new Canvas();
+    this.nCUI = UI.CreateCanvasElement(this.nC, position.add(new Vector(-0.7, 0, 0.45)), widgetWidth, widgetHeight);
     this.nCUI.scale = 0.01;
     this.nCUI.rotation = new Rotator(-65, 0, 180);
     parent.attachUI(this.nCUI);
     //-------------------------
     let borderMain = new ImageWidget().setImage("brosok.png");
     borderMain.scale = 0.1;
-    nC.addChild(borderMain, 0, offsetPlateY / 2, widgetWidth, widgetHeight - offsetPlateY);
+    this.nC.addChild(borderMain, 0, offsetPlateY / 2, widgetWidth, widgetHeight - offsetPlateY);
     //-------------------------
-    this.information = new MultilineTextBox().setTextColor(textColor).setFont(nameFont).setEnabled(false);
-    this.information.setFontSize(40).setBackgroundTransparent(true);
-    nC.addChild(this.information, 0, offsetPlateY / 2 + 2, widgetWidth, widgetHeight - offsetPlateY);
+    this.vertical = new VerticalBox();
+    this.nC.addChild(this.vertical, 0, offsetPlateY / 2, widgetWidth, widgetHeight - offsetPlateY);
     //-------------------------
     let cross = new ImageButton().setImage("cross-icon.png");
-    nC.addChild(cross, widgetWidth - 50, 0, 50, 50);
+    this.nC.addChild(cross, widgetWidth - 50, widgetHeight - offsetPlateY - 100, 50, 50);
     cross.onClicked.add(() => {
       mainInfo.ShowUI();
       t.HideUI();
@@ -295,13 +301,26 @@ class BonusInfo {
   }
 
   SetNamesBonus() {
-    let newText = "";
     for (let i = 0; i < bonuses.length; i++) {
-      if (bonuses[i] != "")
-        newText += bonuses[i] + "\n";
+      if (bonuses[i] != "") {
+        if (!arrayTextBonus[i].getParent()) {
+          arrayTextBonus[i].onClicked.add(() => {
+            if (this.tb) {
+              this.nC.removeChild(this.tb);
+              this.tb = null;
+            } else {
+              this.tb = arrayDescriptionBonus[i].setText(descriptionB[i]);
+              this.nC.addChild(this.tb, 0, 0, widgetWidth, widgetHeight - offsetPlateY - 50);
+            }
+          })
+          this.vertical.addChild(arrayTextBonus[i].setText(bonuses[i]));
+        }
+      }
+      else {
+        arrayTextBonus[i].onClicked.clear();
+        this.vertical.removeChild(arrayTextBonus[i]);
+      }
     }
-    this.information.setText(newText);
-    this.parent.updateUI(this.nCUI);
   }
 
   HideUI() {
@@ -332,12 +351,13 @@ refObject.SetHelthPlate = (plate1, plate2) => {
 refObject.SetValueH = (value) => { mainInfo.fontTextH.setText(value); }
 refObject.SetValueA = (value) => { mainInfo.fontTextA.setText(value); }
 
-let bonuses = [];
-refObject.ChangeNameBonus = (name, remove) => {
+let bonuses = [], descriptionB = [];
+refObject.ChangeNameBonus = (name, remove, description) => {
   if (remove) {
     for (let i = 0; i < bonuses.length; i++) {
       if (bonuses[i] == name) {
         bonuses[i] = "";
+        descriptionB[i] = "";
         break;
       }
     }
@@ -346,12 +366,14 @@ refObject.ChangeNameBonus = (name, remove) => {
     for (let i = 0; i < bonuses.length; i++) {
       if (bonuses[i] == "") {
         bonuses[i] = name;
+        descriptionB[i] = description;
         flag = true;
         break;
       }
     }
     if (!flag) {
       bonuses.push(name);
+      descriptionB.push(description);
     }
   }
   bonusInfo.SetNamesBonus();
@@ -377,6 +399,7 @@ function saveState() {
   let state = {};
   
   state["bonuses"] = bonuses;
+  state["descriptionB"] = descriptionB;
   state["healthMax"] = mainValues["healthMax"];
   state["actionMax"] = mainValues["actionMax"];
   state["health"] = mainInfo.HealthValue;
@@ -393,7 +416,13 @@ function loadState() {
 
   let state = JSON.parse(refObject.getSavedData());
 
-  bonuses = state["bonuses"];
+  let locDes = state["descriptionB"], locBon = state["bonuses"];
+  for (let i = 0; i < locBon.length; i++) {
+    if (locBon[i] != "") {
+      bonuses[i] = locBon[i];
+      descriptionB[i] = locDes[i];
+    }
+  }
   mainValues["healthMax"] = state["healthMax"];
   mainValues["actionMax"] = state["actionMax"];
   mainInfo.HealthValue = state["health"];
