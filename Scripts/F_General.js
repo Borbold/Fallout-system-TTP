@@ -64,7 +64,7 @@ class HelthPoints {
     this.helth = new ImageWidget().setImage("barline1.png");
     UI.CreateImageSlider(this,
       { slider: this.helth, w: 60, h: 80 },
-      { fontSize: 40, x: this.startPosition.x + 450, y: this.startPosition.y + 5, w: 110, h: 60 });
+      { fontSize: 40, x: 450, y: 5, w: 110, h: 60 });
     //-------------------------
     this.backText.onClicked.add(() => {
       t.value = t.maxHelthValue;

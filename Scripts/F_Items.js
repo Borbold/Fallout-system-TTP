@@ -23,7 +23,7 @@ refObject.onGrab.add((obj) => {
 let itemsPurchased = [];
 class BuyItem {
   constructor(parent, position) {
-    let description = refObject.getDescription();
+    let description = parent.getDescription();
     let brokenDescription = description.split(/\s?\n/);
     let price = 0; let wLooking = "price:"
     for (const text of brokenDescription) {
@@ -33,7 +33,7 @@ class BuyItem {
     }
     //-------------------------
     let t = this;
-    this.parent = refObject;
+    this.parent = parent;
     this.hidePosition = position;
     this.startPosition = new Vector(0, 0, zPosition);
     //-------------------------
@@ -42,19 +42,19 @@ class BuyItem {
     this.nCUI.rotation = new Rotator(0, 0, 0);
     parent.attachUI(this.nCUI);
     //-------------------------
-    this.buyItemIcon = new ImageButton().setImage("buy-icon.png");
+    this.buyItemIcon = new ImageButton().setImage("Icons/buy-icon.png");
     this.nC.addChild(this.buyItemIcon, widgetWidth - 30, 0, 30, 30);
     this.buyItemIcon.onClicked.add(() => {
       if (t.snapingObject.ChangeCountCap(price)) {
         let allSnap = t.snapingObject.getAllSnapPoints();
-        let newObject = world.createObjectFromTemplate(refObject.getTemplateId(),
+        let newObject = world.createObjectFromTemplate(parent.getTemplateId(),
           t.snapingObject.getSnapPoint(allSnap.length - 1).getGlobalPosition());
-        newObject.setName(refObject.getName()); newObject.setDescription(refObject.getDescription());
+        newObject.setName(parent.getName()); newObject.setDescription(parent.getDescription());
         itemsPurchased.push(newObject);
       }
     })
     //-------------------------
-    this.crossIcon = new ImageButton().setImage("cross-icon-2.png");
+    this.crossIcon = new ImageButton().setImage("Icons/cross-icon-2.png");
     this.nC.addChild(this.crossIcon, 0, 0, 30, 30);
     this.crossIcon.onClicked.add(() => {
       if (itemsPurchased.length > 0) {
@@ -99,3 +99,5 @@ function loadState() {
 
   snapingObjectId = state["snapingObjectId"];
 }
+//-----------------------------------------------------------------
+refObject.type = "Item";

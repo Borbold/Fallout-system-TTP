@@ -29,16 +29,15 @@ class LevelBox {
     //-------------------------
     this.experienceSlider = new ImageWidget().setImage("barline1.png");
     //**Example for creating a slider with width change
-    //UI.CreateImageSlider(this,
-    //  { slider: this.experienceSlider, w: 60, h: 80 },
-    //  { fontSize: 40, x: widgetWidth / 2 - 50, y: this.startPosition.y + 15, w: 200, h: 60 },
-    //  { tex: "bar1.png", x: 90, y: 310, w: widgetWidth - 180, h: 80 });
-    //**Example for creating a slider with position changing
     UI.CreateImageSlider(this,
       { slider: this.experienceSlider, w: 60, h: 80 },
-      { fontSize: 40, x: widgetWidth / 2 - 150, y: 20, w: 200, h: 60 },
-      { tex: "bar1.png", x: 100, y: 310, w: widgetWidth - 200, h: 80 },
-      { pos: new Vector(1.48, 0, zPosition + 0.01), w: widgetWidth - 200, h: 82 });
+      { fontSize: 40, x: widgetWidth / 2 - 150, y: 15, w: 200, h: 60 },
+      { tex: "bar1.png", x: 90, y: 310, w: widgetWidth - 180, h: 80 });
+    //**Example for creating a slider with position changing
+    //UI.CreateImageSlider(this,
+    //  { slider: this.experienceSlider, w: 60, h: 80 },
+    //  { fontSize: 40, x: widgetWidth / 2 - 150, y: 15, w: 200, h: 60 },
+    //  { tex: "bar1.png", x: 100, y: 310, w: widgetWidth - 200, h: 80 });
     //-------------------------
     UI.CreatePlusMinusButton(this.nC,
       {
@@ -122,11 +121,11 @@ class LevelBox {
 
   UpdateSlider() {
     //**Example for change a slider with width change
-    //UI.ChangeImageSlider(
-    //  this.experienceSlider, this.Ex, this.maxEx, this.startPosition, this.frontText, this.nC, null, 80, 14);
+    UI.ChangeImageSlider(
+      this.experienceSlider, this.Ex, this.maxEx, this.startPosition, this.frontText, this.nC, null, 80, 14);
     //**Example for change a slider with position changing
-    UI.ChangeMaskSlider(
-      this.experienceSlider, this.Ex, this.maxEx, new Vector(199 - widgetWidth, 0), this.frontText, this.nCS, null, { width: widgetWidth - 200, height: 82 }, 14);
+    //UI.ChangeMaskSlider(
+    //  this.experienceSlider, this.Ex, this.maxEx, this.startPosition, this.frontText, this.nC, null, { width: widgetWidth - 220, height: 82 }, 14);
   }
 }
 let infoLevel = new LevelBox(refObject, new Vector(0, 0, zPosition));

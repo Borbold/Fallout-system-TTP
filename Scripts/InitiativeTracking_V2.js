@@ -93,7 +93,7 @@ class InitiativeTracker {
       this.PassOn(whoseMove - 1 >= 0 && String(whoseMove - 1) || countCharacter - 1);
     })
     //--Setting-----------------------
-    let gear = new ImageButton().setImage("gear-icon.png");
+    let gear = new ImageButton().setImage("Icons/gear-icon.png");
     nC.addChild(gear, widgetWidth - 100, 0, 100, 100);
     gear.onClicked.add(() => {
       settings.ShowUI();
@@ -163,7 +163,7 @@ class Settings {
       IT.UpdateVerticalWidget();
     })
     //-------------------------
-    let cross = new ImageButton().setImage("cross-icon.png");
+    let cross = new ImageButton().setImage("Icons/cross-icon.png");
     nC.addChild(cross, widgetWidth - 100, 0, 100, 100);
     cross.onClicked.add(() => {
       IT.ShowUI();

@@ -96,14 +96,14 @@ class MainInfo {
     })
     //--Settings--Bonus---------------------
     if (isNPC) {
-      let gear = new ImageButton().setImage("gear-icon.png");
+      let gear = new ImageButton().setImage("Icons/gear-icon.png");
       nC.addChild(gear, widgetWidth - 50, widgetHeight - offsetPlateY - 100, 50, 50);
       gear.onClicked.add(() => {
         settings.ShowUI();
         t.HideUI();
       })
     } else {
-      let info = new ImageButton().setImage("info-icon.png");
+      let info = new ImageButton().setImage("Icons/info-icon.png");
       nC.addChild(info, widgetWidth - 50, widgetHeight - offsetPlateY - 100, 50, 50);
       info.onClicked.add(() => {
         bonusInfo.ShowUI();
@@ -236,7 +236,7 @@ class Settings {
       this.changedValueAction.setText(boxTableA[boxIndexA]);
     })
     //-------------------------
-    let cross = new ImageButton().setImage("cross-icon.png");
+    let cross = new ImageButton().setImage("Icons/cross-icon.png");
     nC.addChild(cross, widgetWidth - 50, widgetHeight - offsetPlateY - 100, 50, 50);
     cross.onClicked.add(() => {
       mainInfo.ShowUI();
@@ -293,7 +293,7 @@ class BonusInfo {
     this.vertical = new VerticalBox();
     this.nC.addChild(this.vertical, 0, offsetPlateY / 2, widgetWidth, widgetHeight - offsetPlateY);
     //-------------------------
-    let cross = new ImageButton().setImage("cross-icon.png");
+    let cross = new ImageButton().setImage("Icons/cross-icon.png");
     this.nC.addChild(cross, widgetWidth - 50, widgetHeight - offsetPlateY - 100, 50, 50);
     cross.onClicked.add(() => {
       mainInfo.ShowUI();

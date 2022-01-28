@@ -237,24 +237,15 @@ class UI {
     PROCENT: 1,
   }
 
-  CreateImageSlider(parent, frontSlider, fText, backA, canvasA) {
+  CreateImageSlider(parent, frontSlider, fText, backA) {
     CreateBackUI.call(parent, backA);
     //-------------------------
-    if (canvasA) {
-      //**Functionality for creating a slider with position changing
-      parent.nCS = new Canvas();
-      let nCUIS = this.CreateCanvasElement(parent.nCS, canvasA.pos, canvasA.w, canvasA.h);
-      parent.parent.attachUI(nCUIS);
-      parent.nCS.addChild(frontSlider.slider, 0, 0, canvasA.w, canvasA.h);
-    } else {
-      //**Functionality for creating a slider with width change
-      parent.nC.addChild(frontSlider.slider, parent.startPosition.x, parent.startPosition.y, frontSlider.w, frontSlider.h);
-    }
+    parent.nC.addChild(frontSlider.slider, parent.startPosition.x, parent.startPosition.y, frontSlider.w, frontSlider.h);
     //-------------------------
     if (fText) {
       parent.frontText = new Text().setText(parent.Ex + "/" + parent.maxEx).setFont(this.nameFont).setTextColor(this.textColor).setFontSize(fText.fontSize || 40);
-      if (parent.nCS) parent.nCS.addChild(parent.frontText, fText.x, fText.y, fText.w, fText.h);
-      else parent.nC.addChild(parent.frontText, fText.x, fText.y, fText.w, fText.h);
+      fText.x += parent.startPosition.x; fText.y += parent.startPosition.y;
+      parent.nC.addChild(parent.frontText, fText.x, fText.y, fText.w, fText.h);
     }
   }
   //**Functionality for change a slider with width change
@@ -267,7 +258,7 @@ class UI {
   ChangeMaskSlider(image, value, maxValue, position, text, parent, type, size, multiply) {
     ChangeValuesSlider.call(this, text, value, maxValue, type, multiply);
     let newPosX = (this.procent * this.multiply) || 1;
-    parent.updateChild(image, position.x + newPosX, position.y, size.width, size.height);
+    parent.updateChild(image, position.x - size.width + newPosX, position.y, size.width, size.height);
   }
   //-------------------------
   CreateCanvasElement(nC, position, widgetWidth, widgetHeight) {
@@ -290,6 +281,19 @@ class UI {
   }
   GetTextColor() {
     return new Color(1, 0.71, 0.25);
+  }
+  //-------------------------
+  SetHideShowPosition(hidePos, showPos) {
+    this.hidePosition = new Vector(0, 0, hidePos);
+    this.showPosition = new Vector(0, 0, showPos);
+  }
+  HideUI(object, parent) {
+    object.nCUI.position = this.hidePosition;
+    parent.updateUI(object.nCUI);
+  }
+  ShowUI(object, parent) {
+    object.nCUI.position = this.showPosition;
+    parent.updateUI(object.nCUI);
   }
 }
 let ui = new UI();
