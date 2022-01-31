@@ -144,11 +144,11 @@ function ConditionValue(value, checkValue, condition) {
   }
 }
 //-----------------------------------------------------------------
-function CheckPlayerColor(player, check) {
-  if (player.r == check.r && player.g == check.g && player.b == check.b) {
+function CheckPlayerColor(playerColor, check) {
+  if (playerColor.r == check.r && playerColor.g == check.g && playerColor.b == check.b) {
     return true;
   } else {
-    world.broadcastChatMessage("Only the GM (black player) is allowed to press this button", textColor);
+    world.broadcastChatMessage(`Only the ${check} is allowed to press this button`, check);
   }
 }
 module.exports.CheckPlayerColor = CheckPlayerColor;
