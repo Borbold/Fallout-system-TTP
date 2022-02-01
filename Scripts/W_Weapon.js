@@ -1,14 +1,27 @@
 const { refObject, world } = require('@tabletop-playground/api');
 const { UI } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
+let pistol_shoot = world.importSound("Weapon/pistol_shoot.mp3", "", true);
 let clip_off = world.importSound("Weapon/clip_off.mp3");
-let pull_out_the_clip = world.importSound("Weapon/pull_out_the_clip.mp3");
 let shot_without_ammo = world.importSound("Weapon/shot_without_ammo.mp3");
-let pistol_shoot = world.importSound("Weapon/pistol_shoot.mp3");
 //-----------------------------------------------------------------
 const zPosition = refObject.getExtent().z * 1.1;
 const widgetWidth = refObject.getExtent().y * 200;
 const widgetHeight = refObject.getExtent().x * 200;
+//-----------------------------------------------------------------
+refObject.onCreated.add((obj) => {
+  let templateMetadata = obj.getTemplateMetadata();
+  let strings = templateMetadata.split(/\r?\n/);
+  for (let i = 0; i < strings.length; i++) {
+    if (strings[i].includes("Sound shoot:")) {
+      pistol_shoot = world.importSound(strings[i].slice(13), "A19654D34967D1236591BCA0B76CE650", true);
+    } else if (strings[i].includes("Sound clip off:")) {
+      clip_off = world.importSound(strings[i].slice(16), "A19654D34967D1236591BCA0B76CE650");
+    } else if (strings[i].includes("Sound shot without ammo:")) {
+      shot_without_ammo = world.importSound(strings[i].slice(25), "A19654D34967D1236591BCA0B76CE650");
+    }
+  }
+})
 //-----------------------------------------------------------------
 class WeaponShoot {
   constructor(parent, position) {
@@ -40,7 +53,6 @@ class WeaponShoot {
     this.ammunitionClip.onClicked.add(() => {
       if (parent.idClip) {
         clip_off.playAttached(refObject);
-        setTimeout(() => { pull_out_the_clip.playAttached(refObject); }, 200);
         //-------------------------
         let clip = world.getObjectById(parent.idClip);
         clip.setPosition(parent.getPosition().add(new Vector(3, 0, 0)));

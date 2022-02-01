@@ -2,7 +2,6 @@ const { refObject, world } = require('@tabletop-playground/api');
 const { UI, CheckPlayerColor } = require('./general/General_Functions.js');
 //-----------------------------------------------------------------
 let cage = world.importSound("Weapon/cage.mp3");
-let latch_the_bolt = world.importSound("Weapon/latch_the_bolt.mp3");
 //-----------------------------------------------------------------
 const zPosition = refObject.getExtent().z * 1.1;
 const widgetWidth = refObject.getExtent().y * 200;
@@ -23,11 +22,10 @@ refObject.onSnapped.add((obj, _2, snapPoint) => {
   let weapon = snapPoint.getParentObject();
   if (weapon.type && weapon.type == "Weapon" && weapon.idClip == null) {
     cage.playAttached(refObject);
-    setTimeout(() => { latch_the_bolt.playAttached(refObject); }, 250);
     //-------------------------
     weapon.idClip = obj.getId();
     weapon.onSpendAmmo = SpendAmmo;
-    //obj.setScale(new Vector(0.01, 0.01, 0.01));
+    obj.setScale(new Vector(0.01, 0.01, 0.01));
     ClipIn(weapon.getId());
   }
 })
