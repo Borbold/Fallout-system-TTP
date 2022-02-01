@@ -9,13 +9,14 @@ const widgetHeight = refObject.getExtent().x * 200;
 const nameFont = UI.GetTextFont();
 const textColor = UI.GetTextColor();
 //-----------------------------------------------------------------
-let currentAmmo = 0, maxAmmo = 10;
-let textAmmo = "Ammo: " + currentAmmo + "/" + maxAmmo;
-let ammunitionsName = [];
+let currentAmmo = 0;
+let textAmmo = "Ammo: ?";
+let ammunitionsName = [], ammunitionsTID = [];
 //-----------------------------------------------------------------
 refObject.onCreated.add(() => {
   UI.SetHideShowPosition(0, zPosition);
   loadState();
+  ChangeAmmunitionText();
 })
 
 refObject.onSnapped.add((obj, _2, snapPoint) => {
@@ -48,6 +49,16 @@ class SettingsButton {
         UI.ShowUI(settingsClip, parent);
       }
     })
+    //-------------------------
+    let ammoOut = new ImageButton().setImage("Icons/ammo-out-icon.png");
+    this.nC.addChild(ammoOut, 0, 0, 30, 30);
+    ammoOut.onClicked.add(() => {
+      if (ammunitionsTID.length > 0) {
+        let newAmmo = world.createObjectFromTemplate(ammunitionsTID.pop(), parent.getPosition().add(new Vector(3, 0, 0)));
+        newAmmo.setName(ammunitionsName[ammunitionsName.length - 1]);
+        SpendAmmo();
+      }
+    })
   }
 }
 let settingsButton = new SettingsButton(refObject, new Vector(0, 0, zPosition));
@@ -56,16 +67,17 @@ class SettingsClip {
   constructor(parent, position) {
     let t = this;
     this.parent = parent;
+    this.maxAmmo = 10;
     //-------------------------
     this.nC = new Canvas();
     this.nCUI = UI.CreateCanvasElement(this.nC, position, widgetWidth, widgetHeight);
     this.nCUI.rotation = new Rotator(0, 0, 0);
     parent.attachUI(this.nCUI);
     //-------------------------
-    this.maxAmmoTB = new TextBox().setText(maxAmmo).setFontSize(20).setTextColor(textColor).setFont(nameFont).setInputType(4).setSelectTextOnFocus(true);
+    this.maxAmmoTB = new TextBox().setText(this.maxAmmo).setFontSize(20).setTextColor(textColor).setFont(nameFont).setInputType(4).setSelectTextOnFocus(true);
     this.nC.addChild(this.maxAmmoTB, 0, 0, widgetWidth, widgetHeight);
     this.maxAmmoTB.onTextCommitted.add((_1, _2, nText) => {
-      maxAmmo = parseInt(nText);
+      t.maxAmmo = parseInt(nText);
       ChangeAmmunitionText();
     })
     //-------------------------
@@ -84,32 +96,39 @@ let settingsClip = new SettingsClip(refObject, new Vector(0, 0, 0));
 //-----------------------------------------------------------------
 function SpendAmmo() {
   if (currentAmmo > 0) {
+    world.broadcastChatMessage(ammunitionsName.pop());
     currentAmmo--;
     ChangeAmmunitionText();
     return true;
   }
 }
 
-function ChangeAmmunition(value, name) {
+function ChangeAmmunition(value, name, TID) {
   value = parseInt(value);
-  if (currentAmmo + value > maxAmmo) {
-    currentAmmo = maxAmmo;
+  if (currentAmmo + value > settingsClip.maxAmmo) {
+    currentAmmo = settingsClip.maxAmmo;
   } else if (currentAmmo + value < 0) {
     currentAmmo = 0;
   } else {
-    if (value > 0)
-      for (let i = 0; i < value; i++)
+    if (value > 0) {
+      for (let i = 0; i < value; i++) {
         ammunitionsName.push(name);
-    else
-      for (let i = 0; i < -value; i++)
+        ammunitionsTID.push(TID);
+      }
+    }
+    else {
+      for (let i = 0; i < -value; i++) {
         ammunitionsName.pop();
+        ammunitionsTID.pop();
+      }
+    }
 
     currentAmmo += value;
   }
   ChangeAmmunitionText();
 }
 function ChangeAmmunitionText() {
-  textAmmo = "Ammo: " + currentAmmo + "/" + maxAmmo;  
+  textAmmo = "Ammo: " + currentAmmo + "/" + settingsClip.maxAmmo;
   refObject.setDescription(textAmmo);
   saveState();
 }
@@ -120,16 +139,15 @@ function ClipIn(idWeapon) {
 //-----------------------------------------------------------------
 refObject.type = "Clip";
 refObject.onChangeAmmunition = ChangeAmmunition;
-refObject.CheckMaxAmmo = () => { return currentAmmo != maxAmmo; }
-refObject.GetAmmunitions = () => { return ammunitionsName; }
+refObject.CheckMaxAmmo = () => { return currentAmmo != settingsClip.maxAmmo; }
 refObject.ClipOut = () => { ClipIn("0"); }
 //-----------------------------------------------------------------
 function saveState(idWeapon) {
   let state = {};
   
-  state["currentAmmo"] = currentAmmo;
-  state["maxAmmo"] = maxAmmo;
+  state["sAmmo"] = [currentAmmo, settingsClip.maxAmmo];
   state["ammunitionsName"] = ammunitionsName;
+  state["ammunitionsTID"] = ammunitionsTID;
   if (idWeapon)
     state["idWeapon"] = idWeapon;
 
@@ -143,17 +161,14 @@ function loadState() {
   }
 
   let state = JSON.parse(refObject.getSavedData());
-
-  setTimeout(() => {
-    currentAmmo = state["currentAmmo"];
-    maxAmmo = state["maxAmmo"];
-    settingsClip.maxAmmoTB.setText(maxAmmo);
-    ammunitionsName = state["ammunitionsName"];
-    if (state["idWeapon"] && state["idWeapon"] != "0") {
-      let weapon = world.getObjectById(state["idWeapon"]);
-      weapon.idClip = refObject.getId();
-      weapon.onSpendAmmo = SpendAmmo;
-    }
-    ChangeAmmunitionText();
-  }, 50);
+  currentAmmo = state["sAmmo"][0];
+  settingsClip.maxAmmo = state["sAmmo"][1];
+  settingsClip.maxAmmoTB.setText(settingsClip.maxAmmo);
+  ammunitionsName = state["ammunitionsName"] || [];
+  ammunitionsTID = state["ammunitionsTID"] || [];
+  if (state["idWeapon"] && state["idWeapon"] != "0") {
+    let weapon = world.getObjectById(state["idWeapon"]);
+    weapon.idClip = refObject.getId();
+    weapon.onSpendAmmo = SpendAmmo;
+  }
 }

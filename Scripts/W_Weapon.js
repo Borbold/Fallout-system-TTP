@@ -37,8 +37,6 @@ class WeaponShoot {
     this.sight.onClicked.add(() => {
       if (parent.idClip && refObject.onSpendAmmo()) {
         pistol_shoot.playAttached(refObject);
-        let clip = world.getObjectById(parent.idClip);
-        world.broadcastChatMessage(clip.GetAmmunitions().pop());
       } else if (parent.idClip == null) {
         shot_without_ammo.playAttached(refObject);
         //-------------------------
